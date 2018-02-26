@@ -21,10 +21,13 @@ const USER_CACHE = {
     "18vm2ve8": "cabinetcat",
     "18vryoex": "MattHazelnut",
     "48gk04pj": "Puriity",
+    "7j4e4ndx": "Max32",
+    "7j4w6zvx": "ipodcake",
     "98rl2gg8": "fresh_start102",
     "dx3eqz7j": "KingParliament",
     "e8e7w66x": "Mr_Mang0",
     "e8egg6dx": "Sharpeye468",
+    "kjp767kj": "Blarg_Meister",
     "kjpr2ry8": "Gelly",
     "qjn02q4x": "MattOUFC",
     "qxk3od78": "mbm212",
@@ -38,34 +41,182 @@ const USER_CACHE = {
 };
 
 // Single Segment runs
+// (yes hardcoding it is stupid sue me)
 const FULL_GAME = {
-    "7dgreglk": "Africa",
-    "7kjpyzzk": "Asia",
-    "xk9g6jgd": "Canada",
-    "q25qp8g2": "Caribbean",
-    "jdrx01ld": "Europe",
-    "jdz84p6d": "Mexico",
-    "02qox89k": "Middle East",
-    "9d86wjl2": "Oceania",
-    "xd1ex3w2": "South & Central America",
-    "zd36mlrd": "United States",
-    "9kvmgj3k": "World",
-    "q25qz082": "Universe"
+    "7dgreglk": [ // Africa
+        "wl36j2vl", // Variable name
+        [
+            "21d4rep1", // Capitals
+            "gq7ne5p1", // Countries
+            "21gjrn61", // Landscapes/Water
+            "jqz67n21"  // 100%
+        ]
+    ],
+    "7kjpyzzk": [ // Asia
+        "dlomo258", // Variable name
+        [
+            "klrzw3o1", // Capitals
+            "21d47kp1", // Countries
+            "5q8e7kyq", // Landscapes/Water
+            "4qyxez6l"  // 100%
+        ]
+    ],
+    "xk9g6jgd": [ // Canada
+        "jlzkpe7l", // Variable name
+        [
+            "mlny68o1", // Capitals
+            "8105e6oq", // Provinces
+            "9qjzy271", // Landscapes/Water
+            "jq64kvv1"  // 100%
+        ]
+    ],
+    "q25qp8g2": [ // Caribbean
+        "9l73y2zn", // Variable name
+        [
+            "5lmxj281", // Capitals
+            "81wmw7mq", // Countries
+            "zqoywj51"  // 100%
+        ]
+    ],
+    "jdrx01ld": [ // Europe
+        "yn2v0og8", // Variable name
+        [
+            "013vexrl", // Capitals
+            "rqv4wxrq", // Countries
+            "5lekgnml", // Landscapes/Water
+            "0q5oe471"  // 100%
+        ]
+    ],
+    "jdz84p6d": [ // Mexico
+        "6njv1jvn", // Variable name
+        [
+            "4lxxwg3l", // Capitals
+            "814xe9eq", // States
+            "z194gxyl", // Landscapes/Water
+            "p125e9d1"  // 100%
+        ]
+    ],
+    "02qox89k": [ // Middle East
+        "kn04krzl", // Variable name
+        [
+            "81p7wev1", // Capitals
+            "xqkrkod1", // Countries
+            "gq7ne2p1", // Landscapes/Water
+            "21gjr961"  // 100%
+        ]
+    ],
+    "9d86wjl2": [ //Oceania
+        "ql6gy078", // Variable name
+        [
+            "jqz67g21", // Capitals
+            "klrzwxo1", // Countries
+            "gq7ne2y1", // Landscapes/Water
+            "21gjr9m1"  // 100%
+        ]
+    ],
+    "xd1ex3w2": [ //South & Central America
+        "onv65g78", // Variable name
+        [
+            "jqz67gm1", // Capitals
+            "klrzwx21", // Countries
+            "21d47vj1", // Landscapes/Water
+            "5q8e72kq"  // 100%
+        ]
+    ],
+    "zd36mlrd": [ // United States
+        "ylpvyj6l", // Variable name
+        [
+            "4qyxe57l", // Capitals
+            "mlny6dd1", // States
+            "8105e05q", // Landscapes/Water
+            "9qjzywg1"  // 100%
+        ]
+    ],
+    "q25qz082": [ // Universe
+        "rn11kzpn", // Variable name
+        [
+            "zqoypm51", // Capitals
+            "013v8wrl", // States/Provinces/Countries
+            "rqv4p6rq", // Landscapes/Water
+            "5lekr3ml"  // 100%
+        ]
+    ],
+    "9kvmgj3k": "" // World (has no variables yeah that's right
+                   // as if this wasn't inconsistent enough)
 };
 
 let records = {};
 let scores = [];
+let requests = 0;
+let done = 0;
+
+function fetchData() {
+    btn.remove();
+    let status = document.getElementById("status");
+    for(let i = 0; i < 201; i+= 100) {
+        let fetch_url = GAME_URL + "/records?max=100&offset=" + i + "&top=4";
+        let li = document.createElement("li");
+        li.className = "pending";
+        li.innerText = fetch_url.split(BASE_URL)[1];
+        li.dataset.url = fetch_url;
+        status.appendChild(li);
+        httpGetAsync(
+            fetch_url,
+            processResponse
+        );
+    }
+    for(let i in FULL_GAME) {
+        if(FULL_GAME[i].constructor === Array) {
+            for(let j = FULL_GAME[i][1].length - 1; j >= 0; j--) {
+                let fetch_url = BASE_URL
+                  + "/leaderboards/" + SSG_ID   // Game
+                  + "/category/" + i            // Category
+                  + "?var-" + FULL_GAME[i][0]   // Category variable name
+                  + "=" + FULL_GAME[i][1][j]    // Subcategory
+                  + "&top=4";
+
+                let li = document.createElement("li");
+                li.className = "pending";
+                li.innerText = fetch_url.slice(BASE_URL.length);
+                li.dataset.url = fetch_url;
+                status.appendChild(li);
+                httpGetAsync(
+                    fetch_url,
+                    processResponse
+                );
+            }
+        } else {
+            let fetch_url = BASE_URL
+              + "/leaderboards/" + SSG_ID   // Game
+              + "/category/" + i            // Category
+              + "?top=4";
+
+            let li = document.createElement("li");
+            li.className = "pending";
+            li.innerText = fetch_url.slice(BASE_URL.length);
+            li.dataset.url = fetch_url;
+            status.appendChild(li);
+            httpGetAsync(
+                fetch_url,
+                processResponse
+            );
+        }
+    }
+}
 
 function httpGetAsync(url, callback) {
+    requests++;
     let request = new XMLHttpRequest();
     request.onreadystatechange = function() {
         if(request.readyState == 4 && request.status == 200) {
-            callback(request.responseText);
+            callback(request.responseText, url);
             document.querySelector("[data-url=\"" + url + "\"]").className = "done";
-            if(document.getElementsByClassName("pedning").length == 0) {
+            if(++done == requests) {
+                console.log("Done");
                 document.getElementById("status").hidden = true;
             }
         } else if(request.status > 0 && request.status != 200) {
+            done++;
             console.warn(request.status + " on " + url);
             document.querySelector("[data-url=\"" + url + "\"]").className = "error";
         }
@@ -74,7 +225,7 @@ function httpGetAsync(url, callback) {
     request.send();
 }
 
-function processResponse(response) {
+function processResponse(response, url) {
     let obj = JSON.parse(response);
     let data = obj.data;
     let data_array = [];
@@ -89,6 +240,7 @@ function processResponse(response) {
         let catname = data_array[i].weblink.replace(/_/g, " ").split("/ssg/")[1];
         let cat = catname.split("#")[0];
         let name = catname.split("#")[1];
+        if(cat == "full game" && url.indexOf("records") > 0) continue;
         for(let j = runs.length - 1; j >= 0; j--) {
             let player_id = runs[j].run.players[0].id;
             let player = USER_CACHE[player_id] || player_id;
@@ -100,35 +252,6 @@ function processResponse(response) {
         }
     }
     updateScores();
-}
-
-function fetchData() {
-    btn.remove();
-    let status = document.getElementById("status");
-    for(let i = 0; i < 201; i+= 100) {
-        let fetch_url = GAME_URL + "/records?max=100&offset=" + i
-        let li = document.createElement("li");
-        li.className = "pending";
-        li.innerText = fetch_url.split(BASE_URL)[1];
-        li.dataset.url = fetch_url;
-        status.appendChild(li);
-        httpGetAsync(
-            fetch_url,
-            processResponse
-        );
-    }
-    for(let i in FULL_GAME) {
-        let fetch_url = BASE_URL + "/leaderboards/" + SSG_ID + "/category/" + i;
-        let li = document.createElement("li");
-        li.className = "pending";
-        li.innerText = fetch_url.split(BASE_URL)[1];
-        li.dataset.url = fetch_url;
-        status.appendChild(li);
-        httpGetAsync(
-            fetch_url,
-            processResponse
-        );
-    }
 }
 
 function updateScores() {
