@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8"/>
+    <title> SSG Olympics </title>
+    <style type="text/css">#ranks .position,#ranks>li::before{vertical-align:middle}body{color:#e0e0e0;background-color:#202020;font-family:sans-serif;display:flex;justify-content:center;align-items:center;flex-direction:column}#ranks>li{position:relative;text-transform:capitalize;border-bottom:1px solid #1a1a1a}#ranks>li::before{content:"";display:inline-block;height:16px;width:16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}#ranks li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}#ranks li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}#ranks li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}#ranks li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}#ranks .name{font-weight:700}#ranks .score::after{content:" points";text-transform:none}#ranks>li span+span{margin-left:16px}#ranks .place-1{color:#c8953b}#ranks .place-2{color:#90949c}#ranks .place-3{color:#e39775}#ranks .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
+</head>
+<body>
+    <ul id="status"></ul>
+    <ol id="ranks"></ol>
+    <button id="btn" onclick="fetchData();"> Fetch data </button>
+    <script type="text/javascript">
+const SSG_ID = "o6gx78d2";
+const BASE_URL = "https://www.speedrun.com/api/v1";
+
+const GAME_URL = BASE_URL + "/games/" + SSG_ID;
+
+// "cache"
+const USER_CACHE = {
+    "18v0yq2x": "An_Person",
+    "18vm2ve8": "cabinetcat",
+    "18vryoex": "MattHazelnut",
+    "48gk04pj": "Puriity",
+    "98rl2gg8": "fresh_start102",
+    "dx3eqz7j": "KingParliament",
+    "e8e7w66x": "Mr_Mang0",
+    "e8egg6dx": "Sharpeye468",
+    "kjpr2ry8": "Gelly",
+    "qjn02q4x": "MattOUFC",
+    "qxk3od78": "mbm212",
+    "qxk6eok8": "NihilistComedyHour",
+    "qxknw19x": "wysii",
+    "v8lkvyvx": "TheMCGamer",
+    "v8lnk5rx": "yakub3",
+    "zx7e31q8": "Howell",
+    "zx7g54yx": "Breadforbrunch",
+    "zxz9n98q": "btrim"
+};
+
+// Single Segment runs
+const FULL_GAME = {
+    "7dgreglk": "Africa",
+    "7kjpyzzk": "Asia",
+    "xk9g6jgd": "Canada",
+    "q25qp8g2": "Caribbean",
+    "jdrx01ld": "Europe",
+    "jdz84p6d": "Mexico",
+    "02qox89k": "Middle East",
+    "9d86wjl2": "Oceania",
+    "xd1ex3w2": "South & Central America",
+    "zd36mlrd": "United States",
+    "9kvmgj3k": "World",
+    "q25qz082": "Universe"
+};
+
+let records = {};
+let scores = [];
+
+function httpGetAsync(url, callback) {
+    let request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+        if(request.readyState == 4 && request.status == 200) {
+            callback(request.responseText);
+            document.querySelector("[data-url=\"" + url + "\"]").className = "done";
+            if(document.getElementsByClassName("pedning").length == 0) {
+                document.getElementById("status").hidden = true;
+            }
+        } else if(request.status > 0 && request.status != 200) {
+            console.warn(request.status + " on " + url);
+            document.querySelector("[data-url=\"" + url + "\"]").className = "error";
+        }
+    }
+    request.open("GET", url, true);
+    request.send();
+}
+
+function processResponse(response) {
+    let obj = JSON.parse(response);
+    let data = obj.data;
+    let data_array = [];
+    if(data.constructor === Array) {
+        data_array = data;
+    } else {
+        data_array = [data];
+    }
+
+    for(let i = data_array.length - 1; i >= 0; i--) {
+        let runs = data_array[i].runs;
+        let catname = data_array[i].weblink.replace(/_/g, " ").split("/ssg/")[1];
+        let cat = catname.split("#")[0];
+        let name = catname.split("#")[1];
+        for(let j = runs.length - 1; j >= 0; j--) {
+            let player_id = runs[j].run.players[0].id;
+            let player = USER_CACHE[player_id] || player_id;
+            if(!records[player])
+                records[player] = {};
+            if(!records[player][runs[j].place])
+                records[player][runs[j].place] = [];
+            records[player][runs[j].place].push(name + " (" + cat + ")");
+        }
+    }
+    updateScores();
+}
+
+function fetchData() {
+    btn.remove();
+    let status = document.getElementById("status");
+    for(let i = 0; i < 201; i+= 100) {
+        let fetch_url = GAME_URL + "/records?max=100&offset=" + i
+        let li = document.createElement("li");
+        li.className = "pending";
+        li.innerText = fetch_url.split(BASE_URL)[1];
+        li.dataset.url = fetch_url;
+        status.appendChild(li);
+        httpGetAsync(
+            fetch_url,
+            processResponse
+        );
+    }
+    for(let i in FULL_GAME) {
+        let fetch_url = BASE_URL + "/leaderboards/" + SSG_ID + "/category/" + i;
+        let li = document.createElement("li");
+        li.className = "pending";
+        li.innerText = fetch_url.split(BASE_URL)[1];
+        li.dataset.url = fetch_url;
+        status.appendChild(li);
+        httpGetAsync(
+            fetch_url,
+            processResponse
+        );
+    }
+}
+
+function updateScores() {
+    scores = [];
+    for(let i in records) {
+        let obj = {};
+        obj.name = i;
+
+        records[i].score = 0;
+
+        if(records[i]["1"]) {
+            records[i].score += records[i]["1"].length * 3;
+            obj["1"] = records[i]["1"].length;
+        }
+        if(records[i]["2"]) {
+            records[i].score += records[i]["2"].length * 2;
+            obj["2"] = records[i]["2"].length;
+        }
+        if(records[i]["3"]) {
+            records[i].score += records[i]["3"].length * 1;
+            obj["3"] = records[i]["3"].length;
+        }
+        if(records[i]["4"]) {
+            records[i].score += records[i]["4"].length * .5;
+            obj["4"] = records[i]["4"].length;
+        }
+
+        obj.score = records[i].score;
+        scores.push(obj);
+    }
+    scores.sort(function(a, b) {
+        return a.score - b.score;
+    });
+
+    let ranks = document.getElementById("ranks");
+    while(ranks.firstChild) ranks.removeChild(ranks.firstChild);
+    for(let i = scores.length - 1; i >= 0; i--) {
+        let li = document.createElement("li");
+        let p = document.createElement("p");
+        p.className = "position";
+        let name = document.createElement("span");
+        name.innerText = scores[i].name;
+        name.className = "name";
+        let score = document.createElement("span");
+        score.innerText  = scores[i].score;
+        score.className = "score";
+        p.appendChild(name);
+        p.appendChild(score);
+        li.appendChild(p);
+
+        let medals = document.createElement("p");
+        for(let j = 1; j <= 4; j++) {
+            if(!scores[i][j+""]) continue;
+            let span = document.createElement("span");
+            span.className = "place-" + j;
+            span.innerText = scores[i][j+""];
+            medals.appendChild(span);
+        }
+        li.appendChild(medals);
+        ranks.appendChild(li);
+    }
+}
+    </script>
+</body>
+</html>
