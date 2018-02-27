@@ -3,45 +3,45 @@
 <head>
     <meta charset="utf-8"/>
     <title> SSG Olympics </title>
-    <style type="text/css">#ranks .position,#ranks>li::before{vertical-align:middle}body{color:#e0e0e0;background-color:#202020;font-family:sans-serif;display:flex;justify-content:center;align-items:center;flex-direction:column}#ranks>li{position:relative;border-bottom:1px solid #1a1a1a}#ranks>li::before{content:"";display:inline-block;height:16px;width:16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}#ranks li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}#ranks li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}#ranks li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}#ranks li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}#ranks .name{font-weight:700}#ranks .score::after{content:" points"}#ranks>li span+span{margin-left:16px}#ranks .place-1{color:#c8953b}#ranks .place-2{color:#90949c}#ranks .place-3{color:#e39775}#ranks .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
+    <style type="text/css">*{vertical-align:middle}.global-role,.role{font-size:75%}.global-role::before,.role::before{content:"("}.global-role::after,.role::after{content:")"}body{color:#e0e0e0;background-color:#202020;font-family:sans-serif;display:flex;justify-content:center;align-items:center;flex-direction:column}#ranks>li{position:relative;border-bottom:1px solid #1a1a1a}#ranks>li::before{content:"";display:inline-block;height:16px;width:16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}#ranks li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}#ranks li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}#ranks li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}#ranks li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}#ranks .name{font-weight:700}#ranks .score::after{content:" points"}#ranks>li span+span{margin-left:16px}#ranks .place-1{color:#c8953b}#ranks .place-2{color:#90949c}#ranks .place-3{color:#e39775}#ranks .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
 </head>
 <body>
+    <h1 id="title"></h1>
     <ul id="status"></ul>
     <ol id="ranks"></ol>
-    <button id="btn" onclick="fetchData();"> Fetch data </button>
+    <button id="btn" onclick="fetchGame();"> Fetch data </button>
     <script type="text/javascript">
 const SSG_ID = "o6gx78d2";
 const BASE_URL = "https://www.speedrun.com/api/v1";
 
 const GAME_URL = BASE_URL + "/games/" + SSG_ID;
+const status = document.getElementById("status");
+const title = document.getElementById("title");
 
-// "cache"
-const USER_CACHE = {
-    "18v0yq2x": "An_Person",
-    "18vm2ve8": "cabinetcat",
-    "18vryoex": "MattHazelnut",
-    "48gk04pj": "Puriity",
-    "7j4e4ndx": "Max32",
-    "7j4w6zvx": "ipodcake",
-    "98rl2gg8": "fresh_start102",
-    "dx3eqz7j": "KingParliament",
-    "e8e7w66x": "Mr_Mang0",
-    "e8egg6dx": "Sharpeye468",
-    "kjp767kj": "Blarg_Meister",
-    "kjpr2ry8": "Gelly",
-    "qjn02q4x": "MattOUFC",
-    "qxk3od78": "mbm212",
-    "qxk6eok8": "NihilistComedyHour",
-    "qxknw19x": "wysii",
-    "v8lkvyvx": "TheMCGamer",
-    "v8lnk5rx": "yakub3",
-    "zx7e31q8": "Howell",
-    "zx7g54yx": "Breadforbrunch",
-    "zxz9n98q": "btrim"
+let users = {};
+
+// TODO: Make customizable
+let medal_values = {
+    "1": 3,
+    "2": 2,
+    "3": 1,
+    "4": .5
 };
 
-// Single Segment runs
-// (yes hardcoding it is stupid sue me)
+let up = new Error("NOT THE BEES!");
+let todo = [];
+
+// -----------------
+// TODO: This is stupid, come on
+let requests = 0;
+let done = 0;
+let phase = 0;
+// -----------------
+
+
+let game = {};
+
+// TODO: Get rid of this dumb mess
 const FULL_GAME = {
     "7dgreglk": [ // Africa
         "wl36j2vl", // Variable name
@@ -145,27 +145,53 @@ const FULL_GAME = {
                    // as if this wasn't inconsistent enough)
 };
 
-let records = {};
-let scores = [];
-let requests = 0;
-let done = 0;
+function isnt(a, b) {
+    return a === null
+        || a === undefined
+        || a.constructor !== b
+        || (a.constructor === Number && isNaN(a))
+        || (b.constructor === Number && isNaN(b));
+}
+
+function fetchGame(response, url) {
+    if(isnt(response, String) && isnt(url, String)) {
+        btn.remove();
+        console.log("Fetching game data...");
+        httpGetAsync(
+            GAME_URL,
+            fetchGame
+        );
+    } else {
+        let obj = JSON.parse(response);
+        let data = obj.data;
+
+        if(isnt(data, Object)) throw up;
+
+        game.id = data.id;
+        game.name = data.names.international || data.names.japanese || data.abbreviation;
+        document.title = title.innerText = game.name + " - Leaderboard";
+        for(let i in data.moderators) {
+            if(isnt(users[i], Object))
+                users[i] = {};
+            users[i].role = data.moderators[i];
+            users[i].todo = true;
+        }
+        fetchData();
+    }
+}
 
 function fetchData() {
-    btn.remove();
-    let status = document.getElementById("status");
     for(let i = 0; i < 201; i+= 100) {
+        console.log("Fetching IL data (" + i + "/200)...");
         let fetch_url = GAME_URL + "/records?max=100&offset=" + i + "&top=4";
-        let li = document.createElement("li");
-        li.className = "pending";
-        li.innerText = fetch_url.split(BASE_URL)[1];
-        li.dataset.url = fetch_url;
-        status.appendChild(li);
+
         httpGetAsync(
             fetch_url,
             processResponse
         );
     }
     for(let i in FULL_GAME) {
+        console.log("Fetching full-game data (" + i + ")...");
         if(FULL_GAME[i].constructor === Array) {
             for(let j = FULL_GAME[i][1].length - 1; j >= 0; j--) {
                 let fetch_url = BASE_URL
@@ -175,27 +201,18 @@ function fetchData() {
                   + "=" + FULL_GAME[i][1][j]    // Subcategory
                   + "&top=4";
 
-                let li = document.createElement("li");
-                li.className = "pending";
-                li.innerText = fetch_url.slice(BASE_URL.length);
-                li.dataset.url = fetch_url;
-                status.appendChild(li);
                 httpGetAsync(
                     fetch_url,
                     processResponse
                 );
             }
         } else {
+            console.log("Fetching inconsistent leaderboard data...");
             let fetch_url = BASE_URL
               + "/leaderboards/" + SSG_ID   // Game
               + "/category/" + i            // Category
               + "?top=4";
 
-            let li = document.createElement("li");
-            li.className = "pending";
-            li.innerText = fetch_url.slice(BASE_URL.length);
-            li.dataset.url = fetch_url;
-            status.appendChild(li);
             httpGetAsync(
                 fetch_url,
                 processResponse
@@ -211,9 +228,14 @@ function httpGetAsync(url, callback) {
         if(request.readyState == 4 && request.status == 200) {
             callback(request.responseText, url);
             document.querySelector("[data-url=\"" + url + "\"]").className = "done";
-            if(++done == requests) {
+            done++;
+            if(phase === 0 && done === requests) {
+                fetchUsers();
+                phase++;
+            } else if(done === requests) {
                 console.log("Done");
                 document.getElementById("status").hidden = true;
+                updateScores();
             }
         } else if(request.status > 0 && request.status != 200) {
             done++;
@@ -223,91 +245,148 @@ function httpGetAsync(url, callback) {
     }
     request.open("GET", url, true);
     request.send();
+
+    let li = document.createElement("li");
+    li.className = "pending";
+    li.innerText = url.slice(BASE_URL.length);
+    li.dataset.url = url;
+    status.appendChild(li);
 }
 
 function processResponse(response, url) {
     let obj = JSON.parse(response);
-    let data = obj.data;
-    let data_array = [];
-    if(data.constructor === Array) {
-        data_array = data;
-    } else {
-        data_array = [data];
-    }
+    let data = isnt(obj.data, Array) ? [obj.data] : obj.data;
 
-    for(let i = data_array.length - 1; i >= 0; i--) {
-        let runs = data_array[i].runs;
-        let catname = data_array[i].weblink.replace(/_/g, " ").split("/ssg/")[1];
+    for(let i = data.length - 1; i >= 0; i--) {
+        let runs = data[i].runs;
+        let catname = data[i].weblink.replace(/_/g, " ").split("/ssg/")[1];
         let cat = catname.split("#")[0];
         let name = catname.split("#")[1];
         if(cat == "full game" && url.indexOf("records") > 0) continue;
         for(let j = runs.length - 1; j >= 0; j--) {
             let player_id = runs[j].run.players[0].id;
-            let player = USER_CACHE[player_id] || player_id;
-            if(!records[player])
-                records[player] = {};
-            if(!records[player][runs[j].place])
-                records[player][runs[j].place] = [];
-            records[player][runs[j].place].push(name + " (" + cat + ")");
+            let medal = runs[j].place;
+
+            if(isnt(users[player_id], Object)) {
+                users[player_id] = {};
+                todo.push(BASE_URL + "/users/" + player_id);
+            }
+            if(users[player_id].todo) {
+                delete users[player_id].todo;
+                todo.push(BASE_URL + "/users/" + player_id);
+            }
+
+            if(isnt(users[player_id].records, Array))
+                users[player_id].records = [];
+
+            if(isnt(users[player_id].total_medals, Object))
+                users[player_id].total_medals = {};
+
+            if(isnt(users[player_id].total_medals[medal], Number)
+            || users[player_id].total_medals[medal] < 0)
+                users[player_id].total_medals[medal] = 0;
+
+            if(isnt(users[player_id].score, Number)
+            || users[player_id].score < 0)
+                users[player_id].score = 0;
+
+            users[player_id].records.push({
+                level: name + " (" + cat + ")",
+                medal: runs[j].place
+            });
+            users[player_id].total_medals[medal]++;
+            users[player_id].score += medal_values[medal];
+
+            if(isnt(users[player_id].role, String))
+                users[player_id].role = "user";
         }
     }
-    updateScores();
+    if(done == requests) fetchUsers();
+}
+
+function fetchUsers(response, url) {
+    if(isnt(response, String) && isnt(url, String)) {
+        console.log("Fetching user data...");
+        for(let i = todo.length - 1; i >= 0; i--) {
+            httpGetAsync(
+                todo[i],
+                fetchUsers
+            );
+        }
+    } else {
+        let obj = JSON.parse(response);
+        let data = obj.data;
+
+        if(isnt(data, Object)) throw up;
+
+        users[data.id].name = data.names.international || data.names.japanese || data.id;
+        users[data.id].global_role = data.role;
+        users[data.id].link = data.weblink;
+        if(data.location) {
+            // data.location is null if it hasn't been set by the user
+            users[data.id].location = data.location.country.names.international || data.location.country.names.japanese || "";
+        }
+    }
 }
 
 function updateScores() {
-    scores = [];
-    for(let i in records) {
+    let scores = [];
+    for(let i in users) {
         let obj = {};
-        obj.name = i;
-
-        records[i].score = 0;
-
-        if(records[i]["1"]) {
-            records[i].score += records[i]["1"].length * 3;
-            obj["1"] = records[i]["1"].length;
-        }
-        if(records[i]["2"]) {
-            records[i].score += records[i]["2"].length * 2;
-            obj["2"] = records[i]["2"].length;
-        }
-        if(records[i]["3"]) {
-            records[i].score += records[i]["3"].length * 1;
-            obj["3"] = records[i]["3"].length;
-        }
-        if(records[i]["4"]) {
-            records[i].score += records[i]["4"].length * .5;
-            obj["4"] = records[i]["4"].length;
-        }
-
-        obj.score = records[i].score;
+        obj.id = i;
+        obj.score = users[i].score;
         scores.push(obj);
     }
-    scores.sort(function(a, b) {
-        return a.score - b.score;
-    });
+    scores.sort(function(a, b) {  return a.score - b.score;  });
 
     let ranks = document.getElementById("ranks");
     while(ranks.firstChild) ranks.removeChild(ranks.firstChild);
     for(let i = scores.length - 1; i >= 0; i--) {
+        let user = users[scores[i].id];
+
         let li = document.createElement("li");
         let p = document.createElement("p");
-        p.className = "position";
+        p.className = "user";
+
         let name = document.createElement("span");
-        name.innerText = scores[i].name;
+        name.innerText = user.name;
         name.className = "name";
+
         let score = document.createElement("span");
-        score.innerText  = scores[i].score;
+        score.innerText  = user.score;
         score.className = "score";
+
+        /* TODO: Add cute flags
+        let location = document.createElement("span");
+        location.innerText  = user.location;
+        location.className = "location";*/
+
         p.appendChild(name);
         p.appendChild(score);
+        //p.appendChild(location);
+
+        // TODO: Add cute role icons
+        if(user.global_role !== "user") {
+            let global_role = document.createElement("span");
+            global_role.innerText  = user.global_role.replace(/-/g, " ").replace(/moderator/g, "mod");
+            global_role.className = "global-role " + user.global_role;
+            p.appendChild(global_role);
+        }
+        if(user.role !== "user") {
+            let role = document.createElement("span");
+            role.innerText  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
+            role.className = "role " + user.role;
+            p.appendChild(role);
+        }
         li.appendChild(p);
 
         let medals = document.createElement("p");
+        medals.className = "medals";
         for(let j = 1; j <= 4; j++) {
-            if(!scores[i][j+""]) continue;
+            if(!user.total_medals[j]) continue;
             let span = document.createElement("span");
             span.className = "place-" + j;
-            span.innerText = scores[i][j+""];
+            span.innerText = user.total_medals[j];
             medals.appendChild(span);
         }
         li.appendChild(medals);
