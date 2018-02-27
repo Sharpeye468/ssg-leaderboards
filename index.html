@@ -3,13 +3,20 @@
 <head>
     <meta charset="utf-8"/>
     <title> SSG Olympics </title>
-    <style type="text/css">*{vertical-align:middle}.global-role,.role{font-size:75%}.global-role::before,.role::before{content:"("}.global-role::after,.role::after{content:")"}body{color:#e0e0e0;background-color:#202020;font-family:sans-serif;display:flex;justify-content:center;align-items:center;flex-direction:column}#ranks>li{position:relative;border-bottom:1px solid #1a1a1a}#ranks>li::before{content:"";display:inline-block;height:16px;width:16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}#ranks li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}#ranks li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}#ranks li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}#ranks li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}#ranks .name{font-weight:700}#ranks .score::after{content:" points"}#ranks>li span+span{margin-left:16px}#ranks .place-1{color:#c8953b}#ranks .place-2{color:#90949c}#ranks .place-3{color:#e39775}#ranks .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
+    <style type="text/css">*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.location{height:12px;margin-right:8px}.stats label{color:#a0a0a0}.global-role,.role{font-size:75%}.global-role::before,.role::before{content:"("}.global-role::after,.role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}.name:hover>a{text-decoration:underline}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}header{text-align:center}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700}ol .score::after{content:" points"}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
 </head>
 <body>
-    <h1 id="title"></h1>
-    <ul id="status"></ul>
-    <ol id="ranks"></ol>
-    <button id="btn" onclick="fetchGame();"> Fetch data </button>
+    <header id="header" hidden>
+        <button class="ranking-selection" onclick="ranks.hidden=!1;countries.hidden=!0"> Users</button>
+        <button class="ranking-selection" onclick="ranks.hidden=!0;countries.hidden=!1"> Countries </button>
+    </header>
+    <main>
+        <h1 id="title"></h1>
+        <ul id="status"></ul>
+        <ol id="ranks"></ol>
+        <ol id="countries" hidden></ol>
+        <button id="btn" onclick="fetchGame();"> Fetch data </button>
+    </main>
     <script type="text/javascript">
 const SSG_ID = "o6gx78d2";
 const BASE_URL = "https://www.speedrun.com/api/v1";
@@ -19,6 +26,7 @@ const status = document.getElementById("status");
 const title = document.getElementById("title");
 
 let users = {};
+let olympics = {};
 
 // TODO: Make customizable
 let medal_values = {
@@ -156,10 +164,10 @@ function isnt(a, b) {
 function fetchGame(response, url) {
     if(isnt(response, String) && isnt(url, String)) {
         btn.remove();
-        console.log("Fetching game data...");
         httpGetAsync(
             GAME_URL,
-            fetchGame
+            fetchGame,
+            "game data"
         );
     } else {
         let obj = JSON.parse(response);
@@ -182,16 +190,15 @@ function fetchGame(response, url) {
 
 function fetchData() {
     for(let i = 0; i < 201; i+= 100) {
-        console.log("Fetching IL data (" + i + "/200)...");
         let fetch_url = GAME_URL + "/records?max=100&offset=" + i + "&top=4";
 
         httpGetAsync(
             fetch_url,
-            processResponse
+            processResponse,
+            "IL data (" + i + "/200)"
         );
     }
     for(let i in FULL_GAME) {
-        console.log("Fetching full-game data (" + i + ")...");
         if(FULL_GAME[i].constructor === Array) {
             for(let j = FULL_GAME[i][1].length - 1; j >= 0; j--) {
                 let fetch_url = BASE_URL
@@ -203,11 +210,11 @@ function fetchData() {
 
                 httpGetAsync(
                     fetch_url,
-                    processResponse
+                    processResponse,
+                    "full-game data (" + i + ", part " + (j+1) + ")"
                 );
             }
         } else {
-            console.log("Fetching inconsistent leaderboard data...");
             let fetch_url = BASE_URL
               + "/leaderboards/" + SSG_ID   // Game
               + "/category/" + i            // Category
@@ -215,19 +222,82 @@ function fetchData() {
 
             httpGetAsync(
                 fetch_url,
-                processResponse
+                processResponse,
+                "inconsistent leaderboard"
             );
         }
     }
 }
 
-function httpGetAsync(url, callback) {
+function fetchUsers(response, url) {
+    if(isnt(response, String) && isnt(url, String)) {
+        for(let i = todo.length - 1; i >= 0; i--) {
+            httpGetAsync(
+                BASE_URL + "/users/" + todo[i],
+                fetchUsers,
+                "user data (id: " + todo[i] + ")"
+            );
+        }
+    } else {
+        let obj = JSON.parse(response);
+        let data = obj.data;
+        if(isnt(data, Object)) throw up;
+
+        users[data.id].name = data.names.international || data.names.japanese || data.id;
+        users[data.id].global_role = data.role;
+        users[data.id].link = data.weblink;
+        if(data.location) {
+            // data.location is null if it hasn't been set by the user
+            let cc = data.location.country.code;
+            let cn = data.location.country.names.international || data.location.country.names.japanese || cc;
+            users[data.id].location_code = cc;
+            users[data.id].location = cn;
+
+            if(isnt(olympics[cc], Object))
+                olympics[cc] = {};
+
+            if(isnt(olympics[cc].total_time, Number)
+            || olympics[cc].total_time < 0)
+                olympics[cc].total_time = 0;
+
+            olympics[cc].name = cn;
+            olympics[cc].total_time += users[data.id].total_time;
+
+            for(let i in users[data.id].total_medals) {
+
+                if(isnt(olympics[cc].medals, Object))
+                    olympics[cc].medals = {};
+
+                if(isnt(olympics[cc].medals[i], Number)
+                || olympics[cc].medals[i] < 0)
+                    olympics[cc].medals[i] = 0;
+
+                if(isnt(olympics[cc].score, Number)
+                || olympics[cc].score < 0)
+                    olympics[cc].score = 0;
+
+
+                olympics[cc].medals[i] += users[data.id].total_medals[i];
+                olympics[cc].score += medal_values[i] * users[data.id].total_medals[i];
+            }
+
+        }
+    }
+}
+
+function httpGetAsync(url, callback, message, refetch) {
+    if(refetch > 5) {
+        console.error("Could not fetch " + message);
+        return;
+    }
     requests++;
     let request = new XMLHttpRequest();
     request.onreadystatechange = function() {
         if(request.readyState == 4 && request.status == 200) {
-            callback(request.responseText, url);
-            document.querySelector("[data-url=\"" + url + "\"]").className = "done";
+            callback(request.responseText.slice(6,-2), url.slice(0,-11));
+            let done_status = document.querySelector("[data-url=\"" + url + "\"]");
+            done_status.className = "done";
+            setTimeout(function() { done_status.hidden = true }, 250);
             done++;
             if(phase === 0 && done === requests) {
                 fetchUsers();
@@ -235,6 +305,7 @@ function httpGetAsync(url, callback) {
             } else if(done === requests) {
                 console.log("Done");
                 document.getElementById("status").hidden = true;
+                document.getElementById("header").hidden = false;
                 updateScores();
             }
         } else if(request.status > 0 && request.status != 200) {
@@ -243,12 +314,25 @@ function httpGetAsync(url, callback) {
             document.querySelector("[data-url=\"" + url + "\"]").className = "error";
         }
     }
-    request.open("GET", url, true);
+    request.onerror = function() {
+        done++;
+        let error_status = document.querySelector("[data-url=\"" + url + "\"]");
+        console.log("Error on " + url);
+        error_status.className = "error";
+        setTimeout(function() {
+            // Attempt refetch
+            console.info("Attempting refetch on " + url);
+            error_status.remove();
+            if(isnt(refetch, Number) || refetch < 0) refetch = 0;
+            httpGetAsync(url, callback, message, refetch + 1);
+        }, 1500);
+    }
+    request.open("GET", url + (url.indexOf("?")>=0 ? "&callback=k" : "?callback=k"), true);
     request.send();
 
     let li = document.createElement("li");
     li.className = "pending";
-    li.innerText = url.slice(BASE_URL.length);
+    li.innerText = "Fetching " + message + "...";
     li.dataset.url = url;
     status.appendChild(li);
 }
@@ -269,11 +353,11 @@ function processResponse(response, url) {
 
             if(isnt(users[player_id], Object)) {
                 users[player_id] = {};
-                todo.push(BASE_URL + "/users/" + player_id);
+                todo.push(player_id);
             }
             if(users[player_id].todo) {
                 delete users[player_id].todo;
-                todo.push(BASE_URL + "/users/" + player_id);
+                todo.push(player_id);
             }
 
             if(isnt(users[player_id].records, Array))
@@ -290,10 +374,20 @@ function processResponse(response, url) {
             || users[player_id].score < 0)
                 users[player_id].score = 0;
 
+            if(isnt(users[player_id].total_time, Number)
+            || users[player_id].total_time < 0)
+                users[player_id].total_time = 0;
+
+            let time = runs[j].times
+                    ? runs[j].times.primary_t
+                    : runs[j].run.times.primary_t;
+
             users[player_id].records.push({
                 level: name + " (" + cat + ")",
-                medal: runs[j].place
+                medal: runs[j].place,
+                time: time
             });
+            users[player_id].total_time += time;
             users[player_id].total_medals[medal]++;
             users[player_id].score += medal_values[medal];
 
@@ -302,31 +396,6 @@ function processResponse(response, url) {
         }
     }
     if(done == requests) fetchUsers();
-}
-
-function fetchUsers(response, url) {
-    if(isnt(response, String) && isnt(url, String)) {
-        console.log("Fetching user data...");
-        for(let i = todo.length - 1; i >= 0; i--) {
-            httpGetAsync(
-                todo[i],
-                fetchUsers
-            );
-        }
-    } else {
-        let obj = JSON.parse(response);
-        let data = obj.data;
-
-        if(isnt(data, Object)) throw up;
-
-        users[data.id].name = data.names.international || data.names.japanese || data.id;
-        users[data.id].global_role = data.role;
-        users[data.id].link = data.weblink;
-        if(data.location) {
-            // data.location is null if it hasn't been set by the user
-            users[data.id].location = data.location.country.names.international || data.location.country.names.japanese || "";
-        }
-    }
 }
 
 function updateScores() {
@@ -349,21 +418,26 @@ function updateScores() {
         p.className = "user";
 
         let name = document.createElement("span");
-        name.innerText = user.name;
         name.className = "name";
+        let profile = document.createElement("a");
+        profile.innerText = user.name;
+        profile.href = user.link;
+        name.appendChild(profile);
 
         let score = document.createElement("span");
         score.innerText  = user.score;
         score.className = "score";
 
-        /* TODO: Add cute flags
-        let location = document.createElement("span");
-        location.innerText  = user.location;
-        location.className = "location";*/
+        if(user.location) {
+            let location = document.createElement("img");
+            location.title  = user.location;
+            location.src = "https://www.speedrun.com/images/flags/" + user.location_code + ".png";
+            location.className = "location";
+            p.appendChild(location);
+        }
 
         p.appendChild(name);
         p.appendChild(score);
-        //p.appendChild(location);
 
         // TODO: Add cute role icons
         if(user.global_role !== "user") {
@@ -390,8 +464,99 @@ function updateScores() {
             medals.appendChild(span);
         }
         li.appendChild(medals);
+
+        let stats = document.createElement("p");
+        stats.className = "stats";
+        stats.innerHTML = "<div><label>Total runs<sup title='Only record runs'>*</sup>:</label> " + user.records.length + "</div>"
+                         + "<div><label>Total time:</label> " + beautifyTime(user.total_time) + "</div>"
+                         + "<div><label>Average time per run:</label> " + beautifyTime(user.total_time/user.records.length) + "</div>";
+        li.appendChild(stats);
+
         ranks.appendChild(li);
     }
+
+    // Countries
+    scores = [];
+    for(let i in olympics) {
+        let obj = {};
+        obj.cc = i;
+        obj.score = olympics[i].score;
+        scores.push(obj);
+    }
+    scores.sort(function(a, b) {  return a.score - b.score;  });
+
+    let countries = document.getElementById("countries");
+    while(countries.firstChild) countries.removeChild(countries.firstChild);
+    for(let i = scores.length - 1; i >= 0; i--) {
+        let country = olympics[scores[i].cc];
+
+        let li = document.createElement("li");
+        let p = document.createElement("p");
+        p.className = "country";
+
+        let name = document.createElement("span");
+        name.innerText = country.name;
+        name.className = "name";
+
+        let score = document.createElement("span");
+        score.innerText  = country.score;
+        score.className = "score";
+
+        let location = document.createElement("img");
+        location.title  = country.name;
+        location.src = "https://www.speedrun.com/images/flags/" + scores[i].cc + ".png";
+        location.className = "location";
+        p.appendChild(location);
+
+        p.appendChild(name);
+        p.appendChild(score);
+        li.appendChild(p);
+
+        let medal_count = 0;
+        let medals = document.createElement("p");
+        medals.className = "medals";
+        for(let j = 1; j <= 4; j++) {
+            if(!country.medals[j]) continue;
+            let span = document.createElement("span");
+            span.className = "place-" + j;
+            span.innerText = country.medals[j];
+            medals.appendChild(span);
+            medal_count += country.medals[j];
+        }
+        li.appendChild(medals);
+
+        let stats = document.createElement("p");
+        stats.className = "stats";
+        stats.innerHTML = "<div><label>Total runs<sup title='Only record runs'>*</sup>:</label> " + medal_count + "</div>"
+                         + "<div><label>Total time:</label> " + beautifyTime(country.total_time) + "</div>"
+                         + "<div><label>Average time per run:</label> " + beautifyTime(country.total_time/medal_count) + "</div>";
+        li.appendChild(stats);
+
+        countries.appendChild(li);
+    }
+}
+
+function beautifyTime(time) {
+    time = Math.round(time);
+    let hours = ~~(time / (60 * 60));
+
+    let divisor_for_minutes = time % (60 * 60);
+    let minutes = ~~(divisor_for_minutes / 60);
+
+    let divisor_for_seconds = divisor_for_minutes % 60;
+    let seconds = Math.ceil(divisor_for_seconds);
+
+    let out = "";
+    if(hours > 0)
+        out += hours + "h ";
+
+    if(minutes > 0)
+        out += minutes + "min ";
+
+    if(seconds > 0)
+        out += seconds + "s";
+
+    return out.trim();
 }
     </script>
 </body>
