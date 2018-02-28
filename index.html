@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <title> SSG Olympics </title>
-    <style type="text/css">*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.location{height:12px;margin-right:8px}.stats label{color:#a0a0a0}.global-role,.role{font-size:75%}.global-role::before,.role::before{content:"("}.global-role::after,.role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}.name:hover>a{text-decoration:underline}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}header{text-align:center}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700}ol .score::after{content:" points"}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
+    <style type="text/css">*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.role{margin:0 4px 0 -4px;width:14px;height:14px}.location{height:12px;margin-right:8px}.stats label{color:#a0a0a0}.global-role,.role{font-size:75%}.global-role::before{content:"("}.global-role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}.name:hover>a{text-decoration:underline}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}header{text-align:center}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700}ol .score::after{content:" points";color:#a0a0a0}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
 </head>
 <body>
     <header id="header" hidden>
@@ -16,7 +16,7 @@
         <ul id="status"></ul>
         <ol id="ranks"></ol>
         <ol id="countries" hidden></ol>
-        <button id="btn" onclick="fetchGame();"> Fetch data </button>
+        <button id="btn" onclick="init();"> Fetch data </button>
     </main>
     <script type="text/javascript">
 const SSG_ID = "o6gx78d2";
@@ -47,112 +47,8 @@ let done = 0;
 let phase = 0;
 // -----------------
 
-
 let game = {};
-
-// TODO: Get rid of this dumb mess
-const FULL_GAME = {
-    "7dgreglk": [ // Africa
-        "wl36j2vl", // Variable name
-        [
-            "21d4rep1", // Capitals
-            "gq7ne5p1", // Countries
-            "21gjrn61", // Landscapes/Water
-            "jqz67n21"  // 100%
-        ]
-    ],
-    "7kjpyzzk": [ // Asia
-        "dlomo258", // Variable name
-        [
-            "klrzw3o1", // Capitals
-            "21d47kp1", // Countries
-            "5q8e7kyq", // Landscapes/Water
-            "4qyxez6l"  // 100%
-        ]
-    ],
-    "xk9g6jgd": [ // Canada
-        "jlzkpe7l", // Variable name
-        [
-            "mlny68o1", // Capitals
-            "8105e6oq", // Provinces
-            "9qjzy271", // Landscapes/Water
-            "jq64kvv1"  // 100%
-        ]
-    ],
-    "q25qp8g2": [ // Caribbean
-        "9l73y2zn", // Variable name
-        [
-            "5lmxj281", // Capitals
-            "81wmw7mq", // Countries
-            "zqoywj51"  // 100%
-        ]
-    ],
-    "jdrx01ld": [ // Europe
-        "yn2v0og8", // Variable name
-        [
-            "013vexrl", // Capitals
-            "rqv4wxrq", // Countries
-            "5lekgnml", // Landscapes/Water
-            "0q5oe471"  // 100%
-        ]
-    ],
-    "jdz84p6d": [ // Mexico
-        "6njv1jvn", // Variable name
-        [
-            "4lxxwg3l", // Capitals
-            "814xe9eq", // States
-            "z194gxyl", // Landscapes/Water
-            "p125e9d1"  // 100%
-        ]
-    ],
-    "02qox89k": [ // Middle East
-        "kn04krzl", // Variable name
-        [
-            "81p7wev1", // Capitals
-            "xqkrkod1", // Countries
-            "gq7ne2p1", // Landscapes/Water
-            "21gjr961"  // 100%
-        ]
-    ],
-    "9d86wjl2": [ //Oceania
-        "ql6gy078", // Variable name
-        [
-            "jqz67g21", // Capitals
-            "klrzwxo1", // Countries
-            "gq7ne2y1", // Landscapes/Water
-            "21gjr9m1"  // 100%
-        ]
-    ],
-    "xd1ex3w2": [ //South & Central America
-        "onv65g78", // Variable name
-        [
-            "jqz67gm1", // Capitals
-            "klrzwx21", // Countries
-            "21d47vj1", // Landscapes/Water
-            "5q8e72kq"  // 100%
-        ]
-    ],
-    "zd36mlrd": [ // United States
-        "ylpvyj6l", // Variable name
-        [
-            "4qyxe57l", // Capitals
-            "mlny6dd1", // States
-            "8105e05q", // Landscapes/Water
-            "9qjzywg1"  // 100%
-        ]
-    ],
-    "q25qz082": [ // Universe
-        "rn11kzpn", // Variable name
-        [
-            "zqoypm51", // Capitals
-            "013v8wrl", // States/Provinces/Countries
-            "rqv4p6rq", // Landscapes/Water
-            "5lekr3ml"  // 100%
-        ]
-    ],
-    "9kvmgj3k": "" // World (has no variables yeah that's right
-                   // as if this wasn't inconsistent enough)
-};
+let cat_ids = {};
 
 function isnt(a, b) {
     return a === null
@@ -162,10 +58,14 @@ function isnt(a, b) {
         || (b.constructor === Number && isNaN(b));
 }
 
+function init() {
+    document.getElementById("loading").hidden = false;
+    btn.remove();
+    fetchGame();
+}
+
 function fetchGame(response, url) {
     if(isnt(response, String) && isnt(url, String)) {
-        document.getElementById("loading").hidden = false;
-        btn.remove();
         httpGetAsync(
             GAME_URL,
             fetchGame,
@@ -186,11 +86,65 @@ function fetchGame(response, url) {
             users[i].role = data.moderators[i];
             users[i].todo = true;
         }
-        fetchData();
+        fetchCategories();
     }
 }
 
-function fetchData() {
+function fetchCategories(response, url) {
+    if(isnt(response, String) && isnt(url, String)) {
+        httpGetAsync(
+            GAME_URL + "/categories",
+            fetchCategories,
+            "categories"
+        );
+    } else {
+        let obj = JSON.parse(response);
+        let data = obj.data;
+
+        if(isnt(data, Array)) throw up;
+
+        for(let i = data.length - 1; i >= 0; i--) {
+            if(data[i].type === "per-level") continue;
+            cat_ids[data[i].id] = true;
+
+            httpGetAsync(
+                BASE_URL + "/categories/" + data[i].id + "/variables",
+                fetchVariables,
+                "variables (" + i + "/" + data.length + ")"
+            );
+        }
+        fetchILData();
+    }
+}
+
+function fetchVariables(response, url) {
+    let obj = JSON.parse(response);
+    let data = obj.data;
+
+    if(isnt(data, Array)) throw up;
+
+    for(let i = data.length - 1; i >= 0; i--) {
+        let subcats = Object.keys(data[i].values.values);
+        for(let j = subcats.length - 1; j >= 0; j--) {
+            let fetch_url = BASE_URL
+              + "/leaderboards/" + SSG_ID       // Game
+              + "/category/" + data[i].category // Category
+              + "?var-" + data[i].id            // Category variable name
+              + "=" + subcats[j]                // Subcategory
+              + "&top=4";
+
+            cat_ids[data[i].category] = false;
+
+            httpGetAsync(
+                fetch_url,
+                processResponse,
+                data[i].name + " " + data[i].scope.type + " data, part " + (j+1)
+            );
+        }
+    }
+}
+
+function fetchILData() {
     for(let i = 0; i < 201; i+= 100) {
         let fetch_url = GAME_URL + "/records?max=100&offset=" + i + "&top=4";
 
@@ -200,23 +154,11 @@ function fetchData() {
             "IL data (" + i + "/200)"
         );
     }
-    for(let i in FULL_GAME) {
-        if(FULL_GAME[i].constructor === Array) {
-            for(let j = FULL_GAME[i][1].length - 1; j >= 0; j--) {
-                let fetch_url = BASE_URL
-                  + "/leaderboards/" + SSG_ID   // Game
-                  + "/category/" + i            // Category
-                  + "?var-" + FULL_GAME[i][0]   // Category variable name
-                  + "=" + FULL_GAME[i][1][j]    // Subcategory
-                  + "&top=4";
+}
 
-                httpGetAsync(
-                    fetch_url,
-                    processResponse,
-                    "full-game data (" + i + ", part " + (j+1) + ")"
-                );
-            }
-        } else {
+function fetchInconsistencies() {
+    for(let i in cat_ids) {
+        if(cat_ids[i]) {
             let fetch_url = BASE_URL
               + "/leaderboards/" + SSG_ID   // Game
               + "/category/" + i            // Category
@@ -225,7 +167,7 @@ function fetchData() {
             httpGetAsync(
                 fetch_url,
                 processResponse,
-                "inconsistent leaderboard"
+                "inconsistent categories"
             );
         }
     }
@@ -302,6 +244,7 @@ function httpGetAsync(url, callback, message, refetch) {
             setTimeout(function() { done_status.hidden = true }, 250);
             done++;
             if(phase === 0 && done === requests) {
+                fetchInconsistencies();
                 fetchUsers();
                 phase++;
             } else if(done === requests) {
@@ -427,10 +370,6 @@ function updateScores() {
         profile.href = user.link;
         name.appendChild(profile);
 
-        let score = document.createElement("span");
-        score.innerText  = user.score;
-        score.className = "score";
-
         if(user.location) {
             let location = document.createElement("img");
             location.title  = user.location;
@@ -438,9 +377,6 @@ function updateScores() {
             location.className = "location";
             p.appendChild(location);
         }
-
-        p.appendChild(name);
-        p.appendChild(score);
 
         // TODO: Add cute role icons
         if(user.global_role !== "user") {
@@ -450,11 +386,21 @@ function updateScores() {
             p.appendChild(global_role);
         }
         if(user.role !== "user") {
-            let role = document.createElement("span");
-            role.innerText  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
+            let role_url = user.role.replace(/-/g, "").replace(/moderator/g, "mod").toLowerCase();
+            let role = document.createElement("img");
+            role.title  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
+            role.src = "https://www.speedrun.com/images/icons/" + role_url + ".png";
             role.className = "role " + user.role;
             p.appendChild(role);
         }
+
+        p.appendChild(name);
+
+        let score = document.createElement("span");
+        score.innerText  = user.score;
+        score.className = "score";
+
+        p.appendChild(score);
         li.appendChild(p);
 
         let medals = document.createElement("p");
