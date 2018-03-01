@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <title> SSG Olympics </title>
-    <style type="text/css">*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.role{margin:0 4px 0 -4px;width:14px;height:14px}.location{height:12px;margin-right:8px}.stats label{color:#a0a0a0}.global-role,.role{font-size:75%}.global-role::before{content:"("}.global-role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}.name:hover>a{text-decoration:underline}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}header{text-align:center}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700}ol .score::after{content:" points";color:#a0a0a0}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
+    <style type="text/css">*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}.separator{margin-bottom: 1em}.role{margin:0 4px 0 -4px;width:14px;height:14px}.location{height:12px;margin-right:8px}.stats label{color:#a0a0a0}.global-role,.role{font-size:75%}.global-role::before{content:"("}.global-role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}.name:hover>a{text-decoration:underline}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}header{text-align:center}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700}ol .score::after{content:" points";color:#a0a0a0}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}</style>
 </head>
 <body>
     <header id="header" hidden>
@@ -204,8 +204,13 @@ function fetchUsers(response, url) {
             || olympics[cc].total_time < 0)
                 olympics[cc].total_time = 0;
 
+            if(isnt(olympics[cc].total_users, Number)
+            || olympics[cc].total_users < 0)
+                olympics[cc].total_users = 0;
+
             olympics[cc].name = cn;
             olympics[cc].total_time += users[data.id].total_time;
+            olympics[cc].total_users++;
 
             for(let i in users[data.id].total_medals) {
 
@@ -220,11 +225,9 @@ function fetchUsers(response, url) {
                 || olympics[cc].score < 0)
                     olympics[cc].score = 0;
 
-
                 olympics[cc].medals[i] += users[data.id].total_medals[i];
                 olympics[cc].score += medal_values[i] * users[data.id].total_medals[i];
             }
-
         }
     }
 }
@@ -341,7 +344,7 @@ function processResponse(response, url) {
                 users[player_id].role = "user";
         }
     }
-    if(done == requests) fetchUsers();
+    if(done === requests) fetchUsers();
 }
 
 function updateScores() {
@@ -478,7 +481,10 @@ function updateScores() {
         stats.className = "stats";
         stats.innerHTML = "<div><label>Total runs<sup title='Only record runs'>*</sup>:</label> " + medal_count + "</div>"
                          + "<div><label>Total time:</label> " + beautifyTime(country.total_time) + "</div>"
-                         + "<div><label>Average time per run:</label> " + beautifyTime(country.total_time/medal_count) + "</div>";
+                         + "<div><label>Average time per run:</label> " + beautifyTime(country.total_time/medal_count) + "</div>"
+                         + "<div class='separator'></div>"
+                         + "<div><label>Total players:</label> " + country.total_users + "</div>"
+                         + "<div><label>Average points per player:</label> " + round(country.score/country.total_users) + "</div>";
         li.appendChild(stats);
 
         countries.appendChild(li);
@@ -506,6 +512,10 @@ function beautifyTime(time) {
         out += seconds + "s";
 
     return out.trim();
+}
+
+function round(n) {
+    return Math.round(n*10)/10;
 }
     </script>
 </body>
