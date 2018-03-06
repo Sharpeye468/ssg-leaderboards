@@ -4,7 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title> SSG Olympics </title>
-    <style type="text/css">*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}h1{text-align:center;font-size:110%}.separator{margin-bottom:1em}.role{margin:0 4px 0 -4px;width:14px;height:14px}.location{height:12px;margin-right:8px;box-shadow:1px 1px 0 #080808;border-radius:2px}.stats label{color:#a0a0a0}.global-role,.role{font-size:75%}.global-role::before{content:"("}.global-role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}header{text-align:center}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700;text-shadow:0 -1px #000,1px -1px #000,1px 0 #000,1px 1px #000,0 1px #000,-1px 1px #000,-1px 0 #000,-1px -1px #000}ol .score::after{content:" points";color:#a0a0a0}ol .score[data-singular]::after{content:" point"}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}#ranks>li{text-shadow:1px 1px #080808}</style>
+    <style type="text/css">.stats label,h2{color:#a0a0a0}h1,header{text-align:center}*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}h1{font-size:110%}h2{font-size:80%;margin:0;font-weight:400}.separator{margin-bottom:1em}.role{margin:0 4px 0 -4px;width:14px;height:14px}.location{height:12px;margin-right:8px;box-shadow:1px 1px 0 #080808;border-radius:2px}.global-role,.role{font-size:75%}.global-role::before{content:"("}.global-role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700;text-shadow:0 -1px #000,1px -1px #000,1px 0 #000,1px 1px #000,0 1px #000,-1px 1px #000,-1px 0 #000,-1px -1px #000}ol .score::after{content:" points";color:#a0a0a0}ol .score[data-singular]::after{content:" point"}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}#ranks>li{text-shadow:1px 1px #080808}</style>
 </head>
 <body>
     <header id="header" hidden>
@@ -13,6 +13,7 @@
     </header>
     <main>
         <h1 id="title"></h1>
+        <h2 id="subtitle"></h2>
         <img id="loading" hidden alt="loading" src="https://www.speedrun.com/images/loading.png">
         <ul id="status"></ul>
         <ol id="ranks"></ol>
@@ -26,6 +27,7 @@ const BASE_URL = "https://www.speedrun.com/api/v1";
 const GAME_URL = BASE_URL + "/games/" + SSG_ID;
 const status = document.getElementById("status");
 const title = document.getElementById("title");
+const subtitle = document.getElementById("subtitle");
 
 let users = {};
 let olympics = {};
@@ -304,6 +306,10 @@ function processResponse(response, url) {
         let cat = catname.split("#")[0];
         let name = catname.split("#")[1];
         if(cat == "full game" && url.indexOf("records") > 0) continue;
+        if(isnt(game.total_cats, Number)
+        || game.total_cats < 0)
+            game.total_cats = 0;
+        game.total_cats++;
         for(let j = runs.length - 1; j >= 0; j--) {
             let player_id = runs[j].run.players[0].id;
             let medal = runs[j].place;
@@ -371,6 +377,7 @@ function processResponse(response, url) {
 }
 
 function updateScores() {
+    subtitle.innerText = "(" + game.total_cats + " categories)";
     let scores = [];
     for(let i in users) {
         let obj = {};
