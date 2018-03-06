@@ -571,14 +571,20 @@ function makeTextGradient(el, color) {
 
 function beautifyTime(time) {
     if(!time) return "<span style='opacity:.2'>(no runs)</span>";
-    time = Math.round(time);
-    let hours = ~~(time / (60 * 60));
 
-    let divisor_for_minutes = time % (60 * 60);
-    let minutes = ~~(divisor_for_minutes / 60);
+    time *= 1000;
 
-    let divisor_for_seconds = divisor_for_minutes % 60;
-    let seconds = Math.ceil(divisor_for_seconds);
+    // Hot mess in readability, but it works.
+    // Adapted from stackoverflow.com/a/10874157/4824627
+    let _y = 60*60*1000;             // Hour size
+    const hours = ~~(time / _y);     // Actual hours count
+    let _z = 60*1000;                // Minute size
+    let _tmh = time - hours*_y;      // Time minus hours
+    const minutes = ~~(_tmh / _z);   // Actual minutes count
+    let _tso = _tmh - minutes*_z;    // Time minus minutes
+    const seconds = ~~(_tso / 1000); // Actual seconds count
+    const milliseconds =
+            ~~(_tso - seconds*1000); // Actual milliseconds count
 
     let out = "";
     if(hours > 0)
@@ -588,7 +594,10 @@ function beautifyTime(time) {
         out += minutes + "min ";
 
     if(seconds > 0)
-        out += seconds + "s";
+        out += seconds + "s ";
+
+    if(milliseconds > 0)
+        out += milliseconds + "ms";
 
     return out.trim();
 }
