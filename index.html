@@ -83,6 +83,7 @@ function fetchGame(response, url) {
 
         game.id = data.id;
         game.name = data.names.international || data.names.japanese || data.abbreviation;
+        game.abbreviation = data.abbreviation;
         document.title = title.innerText = game.name + "\nLeaderboard";
         for(let i in data.moderators) {
             if(isnt(users[i], Object))
@@ -191,6 +192,10 @@ function fetchUsers(response, url) {
         let obj = JSON.parse(response);
         let data = obj.data;
         if(isnt(data, Object)) throw up;
+
+        if(!users[data.id]
+        || isnt(users[data.id], Object))
+            return;
 
         users[data.id].name = data.names.international || data.names.japanese || data.id;
         users[data.id].global_role = data.role;
@@ -302,17 +307,25 @@ function processResponse(response, url) {
 
     for(let i = data.length - 1; i >= 0; i--) {
         let runs = data[i].runs;
-        let catname = data[i].weblink.replace(/_/g, " ").split("/ssg/")[1];
+        let catname = data[i].weblink.replace(/_/g, " ").split("/" + game.abbreviation + "/")[1];
         let cat = catname.split("#")[0];
         let name = catname.split("#")[1];
-        if(cat == "full game" && url.indexOf("records") > 0) continue;
-        if(isnt(game.total_cats, Number)
-        || game.total_cats < 0)
+
+        if(cat == "full game" && url.indexOf("records") > 0)
+            continue;
+
+        if(isnt(game.total_cats, Number) || game.total_cats < 0)
             game.total_cats = 0;
+
         game.total_cats++;
+
         for(let j = runs.length - 1; j >= 0; j--) {
             let player_id = runs[j].run.players[0].id;
             let medal = runs[j].place;
+
+            if(runs[j].run.players[0].rel === "guest"
+            || !player_id)
+                continue;
 
             if(isnt(users[player_id], Object)) {
                 users[player_id] = {};
@@ -414,14 +427,14 @@ function updateScores() {
             p.appendChild(location);
         }
 
-        // TODO: Add cute role icons
-        if(user.global_role !== "user") {
+        // TODO: Add cute global role icons
+        if(user.global_role && user.global_role !== "user") {
             let global_role = document.createElement("span");
             global_role.innerText  = user.global_role.replace(/-/g, " ").replace(/moderator/g, "mod");
             global_role.className = "global-role " + user.global_role;
             p.appendChild(global_role);
         }
-        if(user.role !== "user") {
+        if(user.role && user.role !== "user") {
             let role_url = user.role.replace(/-/g, "").replace(/moderator/g, "mod").toLowerCase();
             let role = document.createElement("img");
             role.title  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
