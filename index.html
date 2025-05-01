@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title> SSG Olympics </title>
-    <style type="text/css">.stats label,h2{color:#a0a0a0}h1,header{text-align:center}*{vertical-align:middle;outline:0;-webkit-box-sizing:border-box;-moz-box-sizing:border-box;box-sizing:border-box}h1{font-size:110%}h2{font-size:80%;margin:0;font-weight:400}.separator{margin-bottom:1em}.role{margin:0 4px 0 -4px;width:14px;height:14px}.location{height:12px;margin-right:8px;box-shadow:1px 1px 0 #080808;border-radius:2px}.global-role,.role{font-size:75%}.global-role::before{content:"("}.global-role::after{content:")"}button{border:0;padding:10px 20px;background-color:#2b2b2b;color:#e0e0e0;cursor:pointer;-webkit-border-radius:2px;-moz-border-radius:2px;border-radius:2px}button:active{background-color:#757575}.name>a{color:inherit;text-decoration:none}body{background-color:#202020;color:#e0e0e0;font-family:sans-serif}main{display:-webkit-box;display:-webkit-flex;display:-moz-box;display:-ms-flexbox;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;-moz-box-pack:center;-ms-flex-pack:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;-moz-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-orient:vertical;-webkit-box-direction:normal;-webkit-flex-direction:column;-moz-box-orient:vertical;-moz-box-direction:normal;-ms-flex-direction:column;flex-direction:column}ol>li{position:relative;border-bottom:1px solid #1a1a1a}ol>li::before{content:"";display:inline-block;height:16px;width:16px;-webkit-background-size:16px 16px;-moz-background-size:16px 16px;-o-background-size:16px 16px;background-size:16px 16px;background-position:center;background-repeat:no-repeat;position:absolute;left:-40px}ol li:nth-of-type(1)::before{background-image:url(https://www.speedrun.com/themes/ssg/1st.png)}ol li:nth-of-type(2)::before{background-image:url(https://www.speedrun.com/themes/ssg/2nd.png)}ol li:nth-of-type(3)::before{background-image:url(https://www.speedrun.com/themes/ssg/3rd.png)}ol li:nth-of-type(4)::before{background-image:url(https://www.speedrun.com/themes/ssg/4th.png)}ol .name{font-weight:700;text-shadow:0 -1px #000,1px -1px #000,1px 0 #000,1px 1px #000,0 1px #000,-1px 1px #000,-1px 0 #000,-1px -1px #000}ol .score::after{content:" points";color:#a0a0a0}ol .score[data-singular]::after{content:" point"}ol>li span+span{margin-left:16px}ol .place-1{color:#c8953b}ol .place-2{color:#90949c}ol .place-3{color:#e39775}ol .place-4{color:#4a92c0}#status{list-style:none;padding:0;margin:20px 0 0}#status>.pending{color:#ababab}#status>.done{color:#4fb143}#status>.error{color:#b14343}#ranks>li{text-shadow:1px 1px #080808}</style>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title> SSG Olympics </title>
+	<link type="text/css" rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header id="header" hidden>
-        <button class="ranking-selection" onclick="ranks.hidden=!1;countries.hidden=!0"> Users </button>
-        <button class="ranking-selection" onclick="ranks.hidden=!0;countries.hidden=!1"> Countries </button>
-    </header>
-    <main>
-        <h1 id="title"></h1>
-        <h2 id="subtitle"></h2>
-        <img id="loading" hidden alt="loading" src="https://www.speedrun.com/images/loading.png">
-        <ul id="status"></ul>
-        <ol id="ranks"></ol>
-        <ol id="countries" hidden></ol>
-        <button id="btn" onclick="init();"> Fetch data </button>
-    </main>
-    <script type="text/javascript">
+	<header id="header" hidden>
+		<button class="ranking-selection" onclick="ranks.hidden=!1;countries.hidden=!0"> Users </button>
+		<button class="ranking-selection" onclick="ranks.hidden=!0;countries.hidden=!1"> Countries </button>
+	</header>
+	<main>
+		<h1 id="title"></h1>
+		<h2 id="subtitle"></h2>
+		<div id="loading" hidden></div>
+		<ul id="status"></ul>
+		<ol id="ranks"></ol>
+		<ol id="countries" hidden></ol>
+		<button id="btn" onclick="init();"> Fetch data </button>
+	</main>
+	<script type="text/javascript">
 const SSG_ID = "o6gx78d2";
 const BASE_URL = "https://www.speedrun.com/api/v1";
 
@@ -35,10 +35,10 @@ let is_game = {};
 
 // TODO: Make customizable
 let medal_values = {
-    "1": 3,
-    "2": 2,
-    "3": 1,
-    "4": .5
+	"1": 3,
+	"2": 2,
+	"3": 1,
+	"4": .5
 };
 
 let up = new Error("NOT THE BEES!");
@@ -55,591 +55,597 @@ let game = {};
 let cat_ids = {};
 
 function isnt(a, b) {
-    return a === null
-        || a === undefined
-        || a.constructor !== b
-        || (a.constructor === Number && isNaN(a))
-        || (b.constructor === Number && isNaN(b));
+	return a === null
+		|| a === undefined
+		|| a.constructor !== b
+		|| (a.constructor === Number && isNaN(a))
+		|| (b.constructor === Number && isNaN(b));
 }
 
 function init() {
-    document.getElementById("loading").hidden = false;
-    btn.hidden = true;
-    fetchGame();
+	document.getElementById("loading").hidden = false;
+	btn.hidden = true;
+	fetchGame();
 }
 
 function fetchGame(response, url) {
-    if(isnt(response, String) && isnt(url, String)) {
-        httpGetAsync(
-            GAME_URL,
-            fetchGame,
-            "game data"
-        );
-    } else {
-        let obj = JSON.parse(response);
-        let data = obj.data;
+	if(isnt(response, String) && isnt(url, String)) {
+		httpGetAsync(
+			GAME_URL,
+			fetchGame,
+			"game data"
+		);
+	} else {
+		let obj = JSON.parse(response);
+		let data = obj.data;
 
-        if(isnt(data, Object)) throw up;
+		if(isnt(data, Object)) throw up;
 
-        game.id = data.id;
-        game.name = data.names.international || data.names.japanese || data.abbreviation;
-        game.abbreviation = data.abbreviation;
-        document.title = title.innerText = game.name + "\nLeaderboard";
-        for(let i in data.moderators) {
-            if(isnt(users[i], Object))
-                users[i] = {};
-            users[i].role = data.moderators[i];
-            users[i].todo = true;
-        }
-        fetchCategories();
-    }
+		game.id = data.id;
+		game.name = data.names.international || data.names.japanese || data.abbreviation;
+		game.abbreviation = data.abbreviation;
+		document.title = title.innerText = game.name + "\nLeaderboard";
+		for(let i in data.moderators) {
+			if(isnt(users[i], Object))
+				users[i] = {};
+			users[i].role = data.moderators[i];
+			users[i].todo = true;
+		}
+		fetchCategories();
+	}
 }
 
 function fetchCategories(response, url) {
-    if(isnt(response, String) && isnt(url, String)) {
-        httpGetAsync(
-            GAME_URL + "/categories",
-            fetchCategories,
-            "categories"
-        );
-    } else {
-        let obj = JSON.parse(response);
-        let data = obj.data;
+	if(isnt(response, String) && isnt(url, String)) {
+		httpGetAsync(
+			GAME_URL + "/categories",
+			fetchCategories,
+			"categories"
+		);
+	} else {
+		let obj = JSON.parse(response);
+		let data = obj.data;
 
-        if(isnt(data, Array)) throw up;
+		if(isnt(data, Array)) throw up;
 
-        for(let i = data.length - 1; i >= 0; i--) {
-            if(data[i].type === "per-level") continue;
-            is_game[data[i].id] = true;
-            cat_ids[data[i].id] = true;
+		for(let i = data.length - 1; i >= 0; i--) {
+			if(data[i].type === "per-level") continue;
+			is_game[data[i].id] = true;
+			cat_ids[data[i].id] = true;
 
-            httpGetAsync(
-                BASE_URL + "/categories/" + data[i].id + "/variables",
-                fetchVariables,
-                "variables (" + i + "/" + data.length + ")"
-            );
-        }
-        fetchILData();
-    }
+			httpGetAsync(
+				BASE_URL + "/categories/" + data[i].id + "/variables",
+				fetchVariables,
+				"variables (" + i + "/" + data.length + ")"
+			);
+		}
+		fetchILData();
+	}
 }
 
 function fetchVariables(response, url) {
-    let obj = JSON.parse(response);
-    let data = obj.data;
+	let obj = JSON.parse(response);
+	let data = obj.data;
 
-    if(isnt(data, Array)) throw up;
+	if(isnt(data, Array)) throw up;
 
-    for(let i = data.length - 1; i >= 0; i--) {
-        let subcats = Object.keys(data[i].values.values);
-        for(let j = subcats.length - 1; j >= 0; j--) {
-            // Skip HTML5
-            if (data[i].category === "vdox8wod") {
-                continue;
-            }
-            let fetch_url = BASE_URL
-              + "/leaderboards/" + SSG_ID       // Game
-              + "/category/" + data[i].category // Category
-              + "?var-" + data[i].id            // Category variable name
-              + "=" + subcats[j]                // Subcategory
-              + "&top=4";
+	for(let i = data.length - 1; i >= 0; i--) {
+		let subcats = Object.keys(data[i].values.values);
+		for(let j = subcats.length - 1; j >= 0; j--) {
+			// Skip HTML5
+			if (data[i].category === "vdox8wod") {
+				continue;
+			}
+			let fetch_url = BASE_URL
+				+ "/leaderboards/" + SSG_ID       // Game
+				+ "/category/" + data[i].category // Category
+				+ "?var-" + data[i].id            // Category variable name
+				+ "=" + subcats[j]                // Subcategory
+				+ "&top=4";
 
-            cat_ids[data[i].category] = false;
+			cat_ids[data[i].category] = false;
 
-            httpGetAsync(
-                fetch_url,
-                processResponse,
-                data[i].name + " " + data[i].scope.type + " data, part " + (j+1)
-            );
-        }
-    }
+			httpGetAsync(
+				fetch_url,
+				processResponse,
+				data[i].name + " " + data[i].scope.type + " data, part " + (j+1)
+			);
+		}
+	}
 }
 
 function fetchILData() {
-    for(let i = 0; i < 201; i+= 100) {
-        let fetch_url = GAME_URL + "/records?max=100&offset=" + i + "&top=4";
+	for(let i = 0; i < 201; i+= 100) {
+		let fetch_url = GAME_URL + "/records?max=100&offset=" + i + "&top=4";
 
-        httpGetAsync(
-            fetch_url,
-            processResponse,
-            "IL data (" + i + "/200)"
-        );
-    }
+		httpGetAsync(
+			fetch_url,
+			processResponse,
+			"IL data (" + i + "/200)"
+		);
+	}
 }
 
 function fetchInconsistencies() {
-    for(let i in cat_ids) {
-        if(cat_ids[i]) {
-            // Skip HTML5
-            if (i === "vdox8wod") {
-                continue;
-            }
-            let fetch_url = BASE_URL
-              + "/leaderboards/" + SSG_ID   // Game
-              + "/category/" + i            // Category
-              + "?top=4";
+	for(let i in cat_ids) {
+		if(cat_ids[i]) {
+			// Skip HTML5
+			if (i === "vdox8wod") {
+				continue;
+			}
+			let fetch_url = BASE_URL
+			  + "/leaderboards/" + SSG_ID   // Game
+			  + "/category/" + i            // Category
+			  + "?top=4";
 
-            httpGetAsync(
-                fetch_url,
-                processResponse,
-                "inconsistent categories"
-            );
-        }
-    }
+			httpGetAsync(
+				fetch_url,
+				processResponse,
+				"inconsistent categories"
+			);
+		}
+	}
 }
 
 function fetchUsers(response, url) {
-    if(isnt(response, String) && isnt(url, String)) {
-        for(let i = todo.length - 1; i >= 0; i--) {
-            httpGetAsync(
-                BASE_URL + "/users/" + todo[i],
-                fetchUsers,
-                "user data (" + (i+1) + "/" + todo.length + ")"
-            );
-        }
-    } else {
-        let obj = JSON.parse(response);
-        let data = obj.data;
-        if(isnt(data, Object)) throw up;
+	if(isnt(response, String) && isnt(url, String)) {
+		for(let i = todo.length - 1; i >= 0; i--) {
+			httpGetAsync(
+				BASE_URL + "/users/" + todo[i],
+				fetchUsers,
+				"user data (" + (i+1) + "/" + todo.length + ")"
+			);
+		}
+	} else {
+		let obj = JSON.parse(response);
+		let data = obj.data;
+		if(isnt(data, Object)) throw up;
 
-        if(!users[data.id]
-        || isnt(users[data.id], Object))
-            return;
+		if(!users[data.id]
+		|| isnt(users[data.id], Object))
+			return;
 
-        users[data.id].name = data.names.international || data.names.japanese || data.id;
-        users[data.id].global_role = data.role;
-        users[data.id].link = data.weblink;
-        users[data.id].color = [
-            data["name-style"]["color-to"]["dark"],
-            data["name-style"]["color-from"]["dark"]
-        ];
+		users[data.id].name = data.names.international || data.names.japanese || data.id;
+		users[data.id].global_role = data.role;
+		users[data.id].link = data.weblink;
+		users[data.id].color = [
+			data["name-style"]["color-to"]["dark"],
+			data["name-style"]["color-from"]["dark"]
+		];
 
-        if(data.location) {
-            // data.location is null if it hasn't been set by the user
-            let cc = data.location.country.code;
-            let cn = data.location.country.names.international || data.location.country.names.japanese || cc;
-            users[data.id].location_code = cc;
-            users[data.id].location = cn;
+		if(data.location) {
+			// data.location is null if it hasn't been set by the user
+			let cc = data.location.country.code;
+			let cn = data.location.country.names.international || data.location.country.names.japanese || cc;
+			users[data.id].location_code = cc;
+			users[data.id].location = cn;
 
-            if(isnt(olympics[cc], Object))
-                olympics[cc] = {};
+			if(isnt(olympics[cc], Object))
+				olympics[cc] = {};
 
-            if(isnt(olympics[cc].total_time, Number)
-            || olympics[cc].total_time < 0)
-                olympics[cc].total_time = 0;
+			if(isnt(olympics[cc].total_time, Number)
+			|| olympics[cc].total_time < 0)
+				olympics[cc].total_time = 0;
 
-            if(isnt(olympics[cc].total_users, Number)
-            || olympics[cc].total_users < 0)
-                olympics[cc].total_users = 0;
+			if(isnt(olympics[cc].total_users, Number)
+			|| olympics[cc].total_users < 0)
+				olympics[cc].total_users = 0;
 
-            olympics[cc].name = cn;
-            olympics[cc].total_time += users[data.id].total_time;
-            olympics[cc].total_users++;
+			olympics[cc].name = cn;
+			olympics[cc].total_time += users[data.id].total_time;
+			olympics[cc].total_users++;
 
-            for(let i in users[data.id].total_medals) {
+			for(let i in users[data.id].total_medals) {
 
-                if(isnt(olympics[cc].medals, Object))
-                    olympics[cc].medals = {};
+				if(isnt(olympics[cc].medals, Object))
+					olympics[cc].medals = {};
 
-                if(isnt(olympics[cc].medals[i], Number)
-                || olympics[cc].medals[i] < 0)
-                    olympics[cc].medals[i] = 0;
+				if(isnt(olympics[cc].medals[i], Number)
+				|| olympics[cc].medals[i] < 0)
+					olympics[cc].medals[i] = 0;
 
-                if(isnt(olympics[cc].score, Number)
-                || olympics[cc].score < 0)
-                    olympics[cc].score = 0;
+				if(isnt(olympics[cc].score, Number)
+				|| olympics[cc].score < 0)
+					olympics[cc].score = 0;
 
-                olympics[cc].medals[i] += users[data.id].total_medals[i];
-                olympics[cc].score += medal_values[i] * users[data.id].total_medals[i];
-            }
-        }
-    }
+				olympics[cc].medals[i] += users[data.id].total_medals[i];
+				olympics[cc].score += medal_values[i] * users[data.id].total_medals[i];
+			}
+		}
+	}
 }
 
 function httpGetAsync(url, callback, message, refetch) {
-    if(refetch > 5) {
-        console.error("Could not fetch " + message);
-        return;
-    }
-    requests++;
-    let request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-        if(request.readyState == 4 && request.status == 200) {
-            callback(request.responseText.slice(6,-2), url.slice(0,-11));
-            let done_status = document.querySelector("[data-url=\"" + url + "\"]");
-            done_status.className = "done";
-            setTimeout(function() { done_status.hidden = true }, 250);
-            done++;
-            if(phase === 0 && done === requests) {
-                fetchInconsistencies();
-                fetchUsers();
-                phase++;
-            } else if(done === requests) {
-                console.log("Done");
-                document.getElementById("status").hidden = true;
-                document.getElementById("header").hidden = false;
-                document.getElementById("loading").hidden = true;
-                updateScores();
-            }
-        } else if(request.status > 0 && request.status != 200) {
-            done++;
-            console.warn(request.status + " on " + url);
-            document.querySelector("[data-url=\"" + url + "\"]").className = "error";
-        }
-    }
-    request.onerror = function() {
-        done++;
-        let error_status = document.querySelector("[data-url=\"" + url + "\"]");
-        console.log("Error on " + url);
-        error_status.className = "error";
-        setTimeout(function() {
-            // Attempt refetch
-            console.info("Attempting refetch on " + url);
-            error_status.remove();
-            if(isnt(refetch, Number) || refetch < 0) refetch = 0;
-            httpGetAsync(url, callback, message, refetch + 1);
-        }, 1500);
-    }
-    request.open("GET", url + (url.indexOf("?")>=0 ? "&callback=k" : "?callback=k"), true);
-    request.send();
+	if(refetch > 5) {
+		console.error("Could not fetch " + message);
+		return;
+	}
+	requests++;
+	let request = new XMLHttpRequest();
+	request.onreadystatechange = function() {
+		if(request.readyState == 4 && request.status == 200) {
+			callback(request.responseText, url);
+			let done_status = document.querySelector("[data-url=\"" + url + "\"]");
+			done_status.className = "done";
+			setTimeout(function() { done_status.hidden = true }, 250);
+			done++;
+			if(phase === 0 && done === requests) {
+				fetchInconsistencies();
+				fetchUsers();
+				phase++;
+			} else if(done === requests) {
+				console.log("Done");
+				document.getElementById("status").hidden = true;
+				document.getElementById("header").hidden = false;
+				document.getElementById("loading").hidden = true;
+				updateScores();
+			}
+		} else if(request.status > 0 && request.status != 200) {
+			done++;
+			console.warn(request.status + " on " + url);
+			document.querySelector("[data-url=\"" + url + "\"]").className = "error";
+		}
+	}
+	request.onerror = function() {
+		done++;
+		let error_status = document.querySelector("[data-url=\"" + url + "\"]");
+		console.log("Error on " + url);
+		error_status.className = "error";
+		setTimeout(function() {
+			// Attempt refetch
+			console.info("Attempting refetch on " + url);
+			error_status.remove();
+			if(isnt(refetch, Number) || refetch < 0) refetch = 0;
+			httpGetAsync(url, callback, message, refetch + 1);
+		}, 1500);
+	}
+	request.open("GET", url, true);
+	request.send();
 
-    let li = document.createElement("li");
-    li.className = "pending";
-    li.innerText = "Fetching " + message + "...";
-    li.dataset.url = url;
-    status.appendChild(li);
+	let li = document.createElement("li");
+	li.className = "pending";
+	li.innerText = "Fetching " + message + "...";
+	li.dataset.url = url;
+	status.appendChild(li);
 }
 
 function processResponse(response, url) {
-    let obj = JSON.parse(response);
-    let data = isnt(obj.data, Array) ? [obj.data] : obj.data;
+	let obj = JSON.parse(response);
+	let data = isnt(obj.data, Array) ? [obj.data] : obj.data;
 
-    for(let i = data.length - 1; i >= 0; i--) {
-        let runs = data[i].runs;
-        let catname = data[i].weblink.replace(/_/g, " ").split("/" + game.abbreviation + "/")[1];
-        let cat = catname.split("#")[0];
-        let name = catname.split("#")[1];
+	for(let i = data.length - 1; i >= 0; i--) {
+		let runs = data[i].runs;
+		let catname = data[i].weblink.replace(/_/g, " ").split("/" + game.abbreviation + "/")[1];
+		let cat = catname.split("#")[0];
+		let name = catname.split("#")[1];
 
-        if(cat == "full game" && url.indexOf("records") > 0)
-            continue;
+		if(cat == "full game" && url.indexOf("records") > 0)
+			continue;
 
-        if(isnt(game.total_cats, Number) || game.total_cats < 0)
-            game.total_cats = 0;
+		if(isnt(game.total_cats, Number) || game.total_cats < 0)
+			game.total_cats = 0;
 
-        game.total_cats++;
+		game.total_cats++;
 
-        for(let j = runs.length - 1; j >= 0; j--) {
-            let player_id = runs[j].run.players[0].id;
-            let medal = runs[j].place;
+		for(let j = runs.length - 1; j >= 0; j--) {
+			let player_id = runs[j].run.players[0].id;
+			let medal = runs[j].place;
 
-            if(runs[j].run.players[0].rel === "guest"
-            || !player_id)
-                continue;
+			if(runs[j].run.players[0].rel === "guest"
+			|| !player_id)
+				continue;
 
-            if(isnt(users[player_id], Object)) {
-                users[player_id] = {};
-                todo.push(player_id);
-            }
-            if(users[player_id].todo) {
-                delete users[player_id].todo;
-                todo.push(player_id);
-            }
+			if(isnt(users[player_id], Object)) {
+				users[player_id] = {};
+				todo.push(player_id);
+			}
+			if(users[player_id].todo) {
+				delete users[player_id].todo;
+				todo.push(player_id);
+			}
 
-            if(isnt(users[player_id].records, Array))
-                users[player_id].records = [];
+			if(isnt(users[player_id].records, Array))
+				users[player_id].records = [];
 
-            if(isnt(users[player_id].total_medals, Object))
-                users[player_id].total_medals = {};
+			if(isnt(users[player_id].total_medals, Object))
+				users[player_id].total_medals = {};
 
-            if(isnt(users[player_id].total_medals[medal], Number)
-            || users[player_id].total_medals[medal] < 0)
-                users[player_id].total_medals[medal] = 0;
+			if(isnt(users[player_id].total_medals[medal], Number)
+			|| users[player_id].total_medals[medal] < 0)
+				users[player_id].total_medals[medal] = 0;
 
-            if(isnt(users[player_id].score, Number)
-            || users[player_id].score < 0)
-                users[player_id].score = 0;
+			if(isnt(users[player_id].score, Number)
+			|| users[player_id].score < 0)
+				users[player_id].score = 0;
 
-            if(isnt(users[player_id].total_time, Number)
-            || users[player_id].total_time < 0)
-                users[player_id].total_time = 0;
+			if(isnt(users[player_id].total_time, Number)
+			|| users[player_id].total_time < 0)
+				users[player_id].total_time = 0;
 
-            let time = runs[j].times
-                    ? runs[j].times.primary_t
-                    : runs[j].run.times.primary_t;
+			let time = runs[j].times
+					? runs[j].times.primary_t
+					: runs[j].run.times.primary_t;
 
-            users[player_id].records.push({
-                type: is_game[data[i].category] ? "game" : "level",
-                level: name + " (" + cat + ")",
-                medal: runs[j].place,
-                time: time
-            });
+			users[player_id].records.push({
+				type: is_game[data[i].category] ? "game" : "level",
+				level: name + " (" + cat + ")",
+				medal: runs[j].place,
+				time: time
+			});
 
-            if(isnt(users[player_id].game_time, Number)
-            || users[player_id].game_time < 0)
-                users[player_id].game_time = 0;
+			if(isnt(users[player_id].game_time, Number)
+			|| users[player_id].game_time < 0)
+				users[player_id].game_time = 0;
 
-            if(isnt(users[player_id].level_time, Number)
-            || users[player_id].level_time < 0)
-                users[player_id].level_time = 0;
+			if(isnt(users[player_id].level_time, Number)
+			|| users[player_id].level_time < 0)
+				users[player_id].level_time = 0;
 
-            if(is_game[data[i].category])
-                users[player_id].game_time += time;
-            else
-                users[player_id].level_time += time;
+			if(is_game[data[i].category])
+				users[player_id].game_time += time;
+			else
+				users[player_id].level_time += time;
 
-            users[player_id].total_time += time;
-            users[player_id].total_medals[medal]++;
-            users[player_id].score += medal_values[medal];
+			users[player_id].total_time += time;
+			users[player_id].total_medals[medal]++;
+			users[player_id].score += medal_values[medal];
 
-            if(isnt(users[player_id].role, String))
-                users[player_id].role = "user";
-        }
-    }
-    if(done === requests) fetchUsers();
+			if(isnt(users[player_id].role, String))
+				users[player_id].role = "user";
+		}
+	}
+	if(done === requests) fetchUsers();
 }
 
 function updateScores() {
-    subtitle.innerText = "(" + game.total_cats + " categories)";
-    let scores = [];
-    for(let i in users) {
-        let obj = {};
-        obj.id = i;
-        obj.score = users[i].score;
-        scores.push(obj);
-    }
-    scores.sort(function(a, b) {  return a.score - b.score;  });
+	subtitle.innerText = "(" + game.total_cats + " categories)";
+	let scores = [];
+	for(let i in users) {
+		let obj = {};
+		obj.id = i;
+		obj.score = users[i].score;
+		scores.push(obj);
+	}
+	scores.sort(function(a, b) {  return a.score - b.score;  });
 
-    let ranks = document.getElementById("ranks");
-    while(ranks.firstChild) ranks.removeChild(ranks.firstChild);
-    for(let i = scores.length - 1; i >= 0; i--) {
-        let user = users[scores[i].id];
+	let ranks = document.getElementById("ranks");
+	while(ranks.firstChild) ranks.removeChild(ranks.firstChild);
+	for(let i = scores.length - 1; i >= 0; i--) {
+		let user = users[scores[i].id];
 
-        let li = document.createElement("li");
-        let p = document.createElement("p");
-        p.className = "user";
+		let li = document.createElement("li");
+		let p = document.createElement("p");
+		p.className = "user";
 
-        let name = document.createElement("span");
-        name.className = "name";
-        makeTextGradient(name, user.color);
+		let name = document.createElement("span");
+		name.className = "name";
+		makeTextGradient(name, user.color);
 
-        let profile = document.createElement("a");
-        profile.innerText = user.name;
-        profile.target = "_blank";
-        profile.href = user.link;
-        name.appendChild(profile);
+		let profile = document.createElement("a");
+		profile.innerText = user.name;
+		profile.target = "_blank";
+		profile.href = user.link;
+		name.appendChild(profile);
 
-        if(user.location) {
-            let location = document.createElement("img");
-            location.title  = user.location;
-            location.src = "https://www.speedrun.com/images/flags/" + user.location_code + ".png";
-            location.className = "location";
-            p.appendChild(location);
-        }
+		if(user.location) {
+			let location = document.createElement("img");
+			location.title  = user.location;
+			location.src = "https://www.speedrun.com/images/flags/" + user.location_code + ".png";
+			location.className = "location";
+			p.appendChild(location);
+		}
 
-        // TODO: Add cute global role icons
-        if(user.global_role && user.global_role !== "user") {
-            let global_role = document.createElement("span");
-            global_role.innerText  = user.global_role.replace(/-/g, " ").replace(/moderator/g, "mod");
-            global_role.className = "global-role " + user.global_role;
-            p.appendChild(global_role);
-        }
-        if(user.role && user.role !== "user") {
-            let role_url = user.role.replace(/-/g, "").replace(/moderator/g, "mod").toLowerCase();
-            let role = document.createElement("img");
-            role.title  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
-            role.src = "https://www.speedrun.com/_next/static/media/mod-normal.f93510a6.png";
-            if (role.title === "super mod") {
-              role.src = "https://www.speedrun.com/_next/static/media/mod-super.85e082ff.png";
-            }
-            role.className = "role " + user.role;
-            p.appendChild(role);
-        }
+		// TODO: Add cute global role icons
+		if(user.global_role && user.global_role !== "user") {
+			let global_role = document.createElement("span");
+			global_role.innerText  = user.global_role.replace(/-/g, " ").replace(/moderator/g, "mod");
+			global_role.className = "global-role " + user.global_role;
+			p.appendChild(global_role);
+		}
+		if(user.role && user.role !== "user") {
+			let role_url = user.role.replace(/-/g, "").replace(/moderator/g, "mod").toLowerCase();
+			let role = document.createElement("img");
+			role.title  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
 
-        p.appendChild(name);
+			const ICONS_BASE_URL = "https://www.speedrun.com/_next/static/media/";
+			// These are likely to change in the future, so this is bad practice
+			const roles = {
+				"super-moderator": "mod-super.85e082ff.png",
+				"moderator": "mod-normal.f93510a6.png",
+				// I don't even think the API gives us verifiers but whatever
+				"verifier": "mod-verifier.af83bac1.png"
+			};
+			// We'll only add the icon if we know its source
+			if(user.role in roles) {
+				role.src = ICONS_BASE_URL + roles[user.role];
+				role.className = "role " + user.role;
+				p.appendChild(role);
+			}
+			// Otherwise it's best to not add an <img> without `src`
+		}
 
-        let score = document.createElement("span");
-        score.innerText  = user.score;
-        score.className = "score";
-        if(+user.score <= 1)
-            score.dataset.singular = getCompliment();
+		p.appendChild(name);
 
-        p.appendChild(score);
-        li.appendChild(p);
+		let score = document.createElement("span");
+		score.innerText  = user.score;
+		score.className = "score";
+		if(+user.score <= 1)
+			score.dataset.singular = getCompliment();
 
-        let medals = document.createElement("p");
-        medals.className = "medals";
-        for(let j = 1; j <= 4; j++) {
-            if(!user.total_medals[j]) continue;
-            let span = document.createElement("span");
-            span.className = "place-" + j;
-            span.innerText = user.total_medals[j];
-            medals.appendChild(span);
-        }
-        li.appendChild(medals);
+		p.appendChild(score);
+		li.appendChild(p);
 
-        let stats = document.createElement("p");
-        stats.className = "stats";
-        stats.innerHTML =  "<div><label>IL time:</label> " + beautifyTime(user.level_time) + "</div>"
-                         + "<div><label>SS time:</label> " + beautifyTime(user.game_time) + "</div>"
-                         + "<div class='separator'></div>"
-                         + "<div><label>Total runs<sup title='Only leaderboard runs'>*</sup>:</label> " + user.records.length + "</div>"
-                         + "<div><label>Total time:</label> " + beautifyTime(user.total_time) + "</div>"
-                         + "<div><label>Average time per run:</label> " + beautifyTime(user.total_time/user.records.length) + "</div>";
-        li.appendChild(stats);
+		let medals = document.createElement("p");
+		medals.className = "medals";
+		for(let j = 1; j <= 4; j++) {
+			if(!user.total_medals[j]) continue;
+			let span = document.createElement("span");
+			span.className = "place-" + j;
+			span.innerText = user.total_medals[j];
+			medals.appendChild(span);
+		}
+		li.appendChild(medals);
 
-        ranks.appendChild(li);
-    }
+		let stats = document.createElement("p");
+		stats.className = "stats";
+		stats.innerHTML =  "<div><label>IL time:</label> " + beautifyTime(user.level_time) + "</div>"
+						 + "<div><label>SS time:</label> " + beautifyTime(user.game_time) + "</div>"
+						 + "<div class='separator'></div>"
+						 + "<div><label>Total runs<sup title='Only leaderboard runs'>*</sup>:</label> " + user.records.length + "</div>"
+						 + "<div><label>Total time:</label> " + beautifyTime(user.total_time) + "</div>"
+						 + "<div><label>Average time per run:</label> " + beautifyTime(user.total_time/user.records.length) + "</div>";
+		li.appendChild(stats);
 
-    // Countries
-    scores = [];
-    for(let i in olympics) {
-        let obj = {};
-        obj.cc = i;
-        obj.score = olympics[i].score;
-        scores.push(obj);
-    }
-    scores.sort(function(a, b) {  return a.score - b.score;  });
+		ranks.appendChild(li);
+	}
 
-    let countries = document.getElementById("countries");
-    while(countries.firstChild) countries.removeChild(countries.firstChild);
-    for(let i = scores.length - 1; i >= 0; i--) {
-        let country = olympics[scores[i].cc];
+	// Countries
+	scores = [];
+	for(let i in olympics) {
+		let obj = {};
+		obj.cc = i;
+		obj.score = olympics[i].score;
+		scores.push(obj);
+	}
+	scores.sort(function(a, b) {  return a.score - b.score;  });
 
-        let li = document.createElement("li");
-        let p = document.createElement("p");
-        p.className = "country";
+	let countries = document.getElementById("countries");
+	while(countries.firstChild) countries.removeChild(countries.firstChild);
+	for(let i = scores.length - 1; i >= 0; i--) {
+		let country = olympics[scores[i].cc];
 
-        let name = document.createElement("span");
-        name.innerText = country.name;
-        name.className = "name";
+		let li = document.createElement("li");
+		let p = document.createElement("p");
+		p.className = "country";
 
-        let score = document.createElement("span");
-        score.innerText  = country.score;
-        score.className = "score";
-        if(+country.score <= 1)
-            score.dataset.singular = getCompliment();
+		let name = document.createElement("span");
+		name.innerText = country.name;
+		name.className = "name";
 
-        let location = document.createElement("img");
-        location.title  = country.name;
-        location.src = "https://www.speedrun.com/images/flags/" + scores[i].cc + ".png";
-        location.className = "location";
-        p.appendChild(location);
+		let score = document.createElement("span");
+		score.innerText  = country.score;
+		score.className = "score";
+		if(+country.score <= 1)
+			score.dataset.singular = getCompliment();
 
-        p.appendChild(name);
-        p.appendChild(score);
-        li.appendChild(p);
+		let location = document.createElement("img");
+		location.title  = country.name;
+		location.src = "https://www.speedrun.com/images/flags/" + scores[i].cc + ".png";
+		location.className = "location";
+		p.appendChild(location);
 
-        let medal_count = 0;
-        let medals = document.createElement("p");
-        medals.className = "medals";
-        for(let j = 1; j <= 4; j++) {
-            if(!country.medals[j]) continue;
-            let span = document.createElement("span");
-            span.className = "place-" + j;
-            span.innerText = country.medals[j];
-            medals.appendChild(span);
-            medal_count += country.medals[j];
-        }
-        li.appendChild(medals);
+		p.appendChild(name);
+		p.appendChild(score);
+		li.appendChild(p);
 
-        let stats = document.createElement("p");
-        stats.className = "stats";
-        stats.innerHTML = "<div><label>Total runs<sup title='Only leaderboard runs'>*</sup>:</label> " + medal_count + "</div>"
-                         + "<div><label>Total time:</label> " + beautifyTime(country.total_time) + "</div>"
-                         + "<div><label>Average time per run:</label> " + beautifyTime(country.total_time/medal_count) + "</div>"
-                         + "<div class='separator'></div>"
-                         + "<div><label>Total players:</label> " + country.total_users + "</div>"
-                         + "<div><label>Average points per player:</label> " + round(country.score/country.total_users) + "</div>";
-        li.appendChild(stats);
+		let medal_count = 0;
+		let medals = document.createElement("p");
+		medals.className = "medals";
+		for(let j = 1; j <= 4; j++) {
+			if(!country.medals[j]) continue;
+			let span = document.createElement("span");
+			span.className = "place-" + j;
+			span.innerText = country.medals[j];
+			medals.appendChild(span);
+			medal_count += country.medals[j];
+		}
+		li.appendChild(medals);
 
-        countries.appendChild(li);
-    }
+		let stats = document.createElement("p");
+		stats.className = "stats";
+		stats.innerHTML = "<div><label>Total runs<sup title='Only leaderboard runs'>*</sup>:</label> " + medal_count + "</div>"
+						 + "<div><label>Total time:</label> " + beautifyTime(country.total_time) + "</div>"
+						 + "<div><label>Average time per run:</label> " + beautifyTime(country.total_time/medal_count) + "</div>"
+						 + "<div class='separator'></div>"
+						 + "<div><label>Total players:</label> " + country.total_users + "</div>"
+						 + "<div><label>Average points per player:</label> " + round(country.score/country.total_users) + "</div>";
+		li.appendChild(stats);
+
+		countries.appendChild(li);
+	}
 }
 
 function capitalize(str) {
-    return str.charAt(0).toUpperCase() + str.slice(1);
+	return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
 function CSSsupports(prop, value) {
-    let d = document.createElement("div");
-    let prefixes = ["", "webkit","moz","o","ms","khtml"];
+	let d = document.createElement("div");
+	let prefixes = ["", "webkit","moz","o","ms","khtml"];
 
-    for(let i = prefixes.length - 1; i >= 0; i--) {
-        let property = (prefixes[i] !== "") ? prefixes[i] + capitalize(prop) : prop;
+	for(let i = prefixes.length - 1; i >= 0; i--) {
+		let property = (prefixes[i] !== "") ? prefixes[i] + capitalize(prop) : prop;
 
-        if(d.style[property] === "") {
-            d.style[property] = value;
-            if(d.style[property] === value)
-                return true;
-        }
-    }
-    return false;
+		if(d.style[property] === "") {
+			d.style[property] = value;
+			if(d.style[property] === value)
+				return true;
+		}
+	}
+	return false;
 }
 
 function makeTextGradient(el, color) {
-    if(isnt(color, Array)
-    || color.length !== 2) return;
+	if(isnt(color, Array)
+	|| color.length !== 2) return;
 
-    el.style.color = color[0];
-    if(color[0] === color[1]) return;
-    if(!CSSsupports("backgroundClip", "text")) return;
+	el.style.color = color[0];
+	if(color[0] === color[1]) return;
+	if(!CSSsupports("backgroundClip", "text")) return;
 
-    el.style.textShadow = "none";
+	el.style.textShadow = "none";
 
-    el.style.backgroundImage = "linear-gradient(to left," + color[0] + "," + color[1] + ")";
-    el.style.backgroundImage = "-webkit-linear-gradient(left," + color[0] + "," + color[1] + ")";
-    el.style.backgroundImage = "-webkit-gradient(linear, right top, left top, from(" + color[0] + "),to(" + color[1] + "))";
-    el.style.backgroundImage = "-moz-linear-gradient(right," + color[0] + "," + color[1] + ")";
-    el.style.backgroundImage = "-o-linear-gradient(right," + color[0] + "," + color[1] + ")";
+	el.style.backgroundImage = "linear-gradient(to left," + color[0] + "," + color[1] + ")";
 
-    el.style.webkitBackgroundClip = "text";
-    el.style.mozBackgroundClip = "text";
-    el.style.oBackgroundClip = "text";
-    el.style.backgroundClip = "text";
+	el.style.webkitBackgroundClip = "text";
+	el.style.mozBackgroundClip = "text";
+	el.style.oBackgroundClip = "text";
+	el.style.backgroundClip = "text";
 
-    el.style.webkitTextFillColor = "transparent";
-    el.style.textFillColor = "transparent";
+	el.style.webkitTextFillColor = "transparent";
+	el.style.textFillColor = "transparent";
 }
 
 function beautifyTime(time) {
-    if(!time) return "<span style='opacity:.2'>(no runs)</span>";
+	if(!time) return "<span style='opacity:.4'>(no runs)</span>";
 
-    time *= 1000;
+	time *= 1000;
 
-    // Hot mess in readability, but it works.
-    // Adapted from stackoverflow.com/a/10874157/4824627
-    let _y = 60*60*1000;             // Hour size
-    const hours = ~~(time / _y);     // Actual hours count
-    let _z = 60*1000;                // Minute size
-    let _tmh = time - hours*_y;      // Time minus hours
-    const minutes = ~~(_tmh / _z);   // Actual minutes count
-    let _tso = _tmh - minutes*_z;    // Time minus minutes
-    const seconds = ~~(_tso / 1000); // Actual seconds count
-    const milliseconds =
-            ~~(_tso - seconds*1000); // Actual milliseconds count
+	// Hot mess in readability, but it works.
+	// Adapted from stackoverflow.com/a/10874157/4824627
+	let _y = 60*60*1000;             // Hour size
+	const hours = ~~(time / _y);     // Actual hours count
+	let _z = 60*1000;                // Minute size
+	let _tmh = time - hours*_y;      // Time minus hours
+	const minutes = ~~(_tmh / _z);   // Actual minutes count
+	let _tso = _tmh - minutes*_z;    // Time minus minutes
+	const seconds = ~~(_tso / 1000); // Actual seconds count
+	const milliseconds =
+			~~(_tso - seconds*1000); // Actual milliseconds count
 
-    let out = "";
-    if(hours > 0)
-        out += hours + "h ";
+	let out = "";
+	if(hours > 0)
+		out += hours + "h ";
 
-    if(minutes > 0)
-        out += minutes + "min ";
+	if(minutes > 0)
+		out += minutes + "min ";
 
-    if(seconds > 0)
-        out += seconds + "s ";
+	if(seconds > 0)
+		out += seconds + "s ";
 
-    if(milliseconds > 0)
-        out += milliseconds + "ms";
+	if(milliseconds > 0)
+		out += milliseconds + "ms";
 
-    return out.trim();
+	return out.trim();
 }
 
 function round(n) {
-    return Math.round(n*10)/10;
+	return Math.round(n*10)/10;
 }
 
 function getCompliment() {
-    return ["Yes", "Right", "Good", "Great"][~~(Math.random()*3)] + "!"
+	return ["Yes", "Right", "Good", "Great"][~~(Math.random()*3)] + "!"
 }
-    </script>
+	</script>
 </body>
 </html>
