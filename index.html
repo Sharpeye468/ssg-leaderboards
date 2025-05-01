@@ -132,6 +132,10 @@ function fetchVariables(response, url) {
     for(let i = data.length - 1; i >= 0; i--) {
         let subcats = Object.keys(data[i].values.values);
         for(let j = subcats.length - 1; j >= 0; j--) {
+            // Skip HTML5
+            if (data[i].category === "vdox8wod") {
+                continue;
+            }
             let fetch_url = BASE_URL
               + "/leaderboards/" + SSG_ID       // Game
               + "/category/" + data[i].category // Category
@@ -165,6 +169,10 @@ function fetchILData() {
 function fetchInconsistencies() {
     for(let i in cat_ids) {
         if(cat_ids[i]) {
+            // Skip HTML5
+            if (i === "vdox8wod") {
+                continue;
+            }
             let fetch_url = BASE_URL
               + "/leaderboards/" + SSG_ID   // Game
               + "/category/" + i            // Category
@@ -438,7 +446,10 @@ function updateScores() {
             let role_url = user.role.replace(/-/g, "").replace(/moderator/g, "mod").toLowerCase();
             let role = document.createElement("img");
             role.title  = user.role.replace(/-/g, " ").replace(/moderator/g, "mod");
-            role.src = "https://www.speedrun.com/images/icons/" + role_url + ".png";
+            role.src = "https://www.speedrun.com/_next/static/media/mod-normal.f93510a6.png";
+            if (role.title === "super mod") {
+              role.src = "https://www.speedrun.com/_next/static/media/mod-super.85e082ff.png";
+            }
             role.className = "role " + user.role;
             p.appendChild(role);
         }
