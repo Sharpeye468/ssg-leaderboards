@@ -333,9 +333,12 @@ function processResponse(response, url) {
 
 			if(runs[j].run.players[0].rel === "guest"
 			|| !player_id) {
-				game.total_cats--;
+				game.total_cats--; // Not a real category
 				continue;
 			}
+
+			if(name === "Europe Geography" && cat === "Lakes") // "Fake" Howell cat
+                		game.total_cats--;
 			
 			if(isnt(users[player_id], Object)) {
 				users[player_id] = {};
