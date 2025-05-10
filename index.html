@@ -332,9 +332,11 @@ function processResponse(response, url) {
 			let medal = runs[j].place;
 
 			if(runs[j].run.players[0].rel === "guest"
-			|| !player_id)
+			|| !player_id) {
+				game.total_cats--;
 				continue;
-
+			}
+			
 			if(isnt(users[player_id], Object)) {
 				users[player_id] = {};
 				todo.push(player_id);
